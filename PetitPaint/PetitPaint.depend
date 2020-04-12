@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1586705685 source:d:\etf\petitpaint\petitpaint\main.cpp
+	<iostream>
+	<SDL.h>
+
+1586706269 source:d:\etf\petitpaint\petitpaint\icon.rc
+
