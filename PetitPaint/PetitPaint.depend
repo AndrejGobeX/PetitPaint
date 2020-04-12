@@ -1,7 +1,16 @@
 # depslib dependency file v1.0
-1586705685 source:d:\etf\petitpaint\petitpaint\main.cpp
+1586707566 source:d:\etf\petitpaint\petitpaint\main.cpp
 	<iostream>
 	<SDL.h>
+	"Window.h"
 
 1586706269 source:d:\etf\petitpaint\petitpaint\icon.rc
+
+1586709231 d:\etf\petitpaint\petitpaint\include\window.h
+	<string>
+
+1586709234 source:d:\etf\petitpaint\petitpaint\src\window.cpp
+	"Window.h"
+	<SDL.h>
+	<iostream>
 
