@@ -37,7 +37,11 @@
 			<Option compilerVar="WINDRES" />
 		</Unit>
 		<Unit filename="Main.cpp" />
+		<Unit filename="include/Formater.h" />
+		<Unit filename="include/Image.h" />
 		<Unit filename="include/Window.h" />
+		<Unit filename="src/Formater.cpp" />
+		<Unit filename="src/Image.cpp" />
 		<Unit filename="src/Window.cpp" />
 		<Extensions>
 			<code_completion />
