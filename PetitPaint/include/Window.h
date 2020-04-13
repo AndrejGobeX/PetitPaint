@@ -15,6 +15,7 @@ class Window
         SDL_Surface* get_surface(){return screenSurface;};
 
         void set_background(std::string path);
+        void set_background(SDL_Surface* surface);
 
     protected:
 

@@ -46,3 +46,9 @@ void Window::set_background(std::string path)
     SDL_BlitSurface(background, nullptr, screenSurface, nullptr);
     SDL_UpdateWindowSurface(window);
 }
+
+void Window::set_background(SDL_Surface* surface)
+{
+    SDL_BlitSurface(surface, nullptr, screenSurface, nullptr);
+    SDL_UpdateWindowSurface(window);
+}
