@@ -9,8 +9,8 @@
 
 using namespace std;
 
-const int SCREEN_HEIGHT=500;
-const int SCREEN_WIDTH=500;
+const int SCREEN_HEIGHT=417;
+const int SCREEN_WIDTH=417;
 
 int main(int argc, char* argv[])
 {
@@ -27,6 +27,10 @@ int main(int argc, char* argv[])
         while(SDL_PollEvent(&e)!=0)
         {
             if(e.type==SDL_QUIT)n_quit=false;
+            else
+            {
+                win.handle_event(e);
+            }
         }
     }
 
