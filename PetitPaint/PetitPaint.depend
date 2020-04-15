@@ -1,7 +1,7 @@
 # depslib dependency file v1.0
 1586706269 source:d:\etf\petitpaint\petitpaint\icon.rc
 
-1586885734 source:d:\etf\petitpaint\petitpaint\main.cpp
+1586948016 source:d:\etf\petitpaint\petitpaint\main.cpp
 	<iostream>
 	<SDL.h>
 	"Window.h"
@@ -11,15 +11,17 @@
 	"Formater.h"
 	"Image.h"
 
-1586942856 d:\etf\petitpaint\petitpaint\include\window.h
+1586947602 d:\etf\petitpaint\petitpaint\include\window.h
 	<string>
 	<SDL.h>
 	"Layer.h"
 	<windows.h>
 	<winuser.h>
 	<vector>
+	<SDL_syswm.h>
+	<SDL_image.h>
 
-1586889479 source:d:\etf\petitpaint\petitpaint\src\window.cpp
+1586948459 source:d:\etf\petitpaint\petitpaint\src\window.cpp
 	"Window.h"
 	<iostream>
 

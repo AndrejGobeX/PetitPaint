@@ -7,6 +7,8 @@
 #include<windows.h>
 #include<winuser.h>
 #include<vector>
+#include<SDL_syswm.h>
+#include<SDL_image.h>
 
 class Window
 {
@@ -47,6 +49,8 @@ class Window
         bool MouseFocus=false;
         bool KeyboardFocus=false;
         bool Minimized=false;
+
+        HMENU menubar=nullptr;
 };
 
 #endif // WINDOW_H

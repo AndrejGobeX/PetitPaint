@@ -10,8 +10,13 @@ Window::Window(const int& SCREEN_HEIGHT, const int& SCREEN_WIDTH): width(SCREEN_
         std::cout<<"SDL could not initialize. Error: "<<SDL_GetError()<<"\n";
         throw INIT_ERROR;
     }
+    if(!(IMG_Init(IMG_INIT_PNG)&IMG_INIT_PNG))
+    {
+        std::cout<<"IMG could not initialize. Error: "<<IMG_GetError()<<"\n";
+        throw INIT_ERROR;
+    }
     window = SDL_CreateWindow( "PetitPaint", SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
+        SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT+20, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE);
     if(window==nullptr)
     {
         std::cout<<"SDL window not created. Error: "<<SDL_GetError()<<"\n";
@@ -19,7 +24,7 @@ Window::Window(const int& SCREEN_HEIGHT, const int& SCREEN_WIDTH): width(SCREEN_
     }
 
     screenSurface=SDL_GetWindowSurface(window);
-    SDL_FillRect(screenSurface, nullptr, SDL_MapRGB(screenSurface->format, 0x0, 0x0, 0x0));
+    SDL_FillRect(screenSurface, nullptr, SDL_MapRGBA(screenSurface->format, 0x0, 0x0, 0x0, 0xFF));
     SDL_UpdateWindowSurface(window);
     renderer=SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(renderer==nullptr)
@@ -34,7 +39,26 @@ Window::Window(const int& SCREEN_HEIGHT, const int& SCREEN_WIDTH): width(SCREEN_
     rect.x=0;
     rect.y=0;
 
-
+    SDL_SysWMinfo sysInfo;
+    SDL_VERSION(&sysInfo.version);
+    SDL_GetWindowWMInfo(window, &sysInfo);
+    HWND hwnd=sysInfo.info.win.window;
+    menubar=CreateMenu();
+    HMENU file=CreateMenu();
+    HMENU new_=CreateMenu();
+    HMENU exit=CreateMenu();
+    HMENU edit=CreateMenu();
+    HMENU export_=CreateMenu();
+    HMENU save=CreateMenu();
+    HMENU import=CreateMenu();
+    AppendMenu(menubar, MF_POPUP, (UINT_PTR)file, "File");
+    AppendMenu(menubar, MF_POPUP, (UINT_PTR)edit, "Edit");
+    AppendMenu(file, MF_STRING, (UINT_PTR)new_, "New");
+    AppendMenu(file, MF_STRING, (UINT_PTR)save, "Save");
+    AppendMenu(file, MF_STRING, (UINT_PTR)import, "Import");
+    AppendMenu(file, MF_STRING, (UINT_PTR)export_, "Export");
+    AppendMenu(file, MF_STRING, (UINT_PTR)exit, "Exit");
+    SetMenu(hwnd, menubar);
 }
 
 Window::~Window()
@@ -50,6 +74,7 @@ Window::~Window()
         SDL_DestroyRenderer(renderer);
         renderer=nullptr;
     }
+    DestroyMenu(menubar);
     SDL_Quit();
 }
 
