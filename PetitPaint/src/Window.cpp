@@ -27,12 +27,14 @@ Window::Window(const int& SCREEN_HEIGHT, const int& SCREEN_WIDTH): width(SCREEN_
         std::cout<<"SDL renderer not created. Error: "<<SDL_GetError()<<"\n";
         throw RENDER_ERROR;
     }
-    SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_SetRenderDrawColor(renderer, 0x00, 0xAA, 0xAA, 0xFF);
 
     rect.h=height;
     rect.w=width;
     rect.x=0;
     rect.y=0;
+
+
 }
 
 Window::~Window()
@@ -66,18 +68,26 @@ void Window::set_background(std::string path)
     SDL_DestroyTexture(texture);
     texture=nullptr;
 
+    SDL_RenderDrawLine(renderer, rect.w+1, 0, rect.w+1, rect.h+1);
+    SDL_RenderDrawLine(renderer, 0, rect.h+1, rect.w+1, rect.h+1);
+
     SDL_RenderPresent(renderer);
 }
 
 void Window::set_background(SDL_Surface* surface)
 {
-    SDL_BlitSurface(surface, nullptr, background, nullptr);
+    SDL_Rect tr;
+    tr.x=tr.y=tr.h=tr.w=200;
+    SDL_BlitSurface(surface, nullptr, background, &tr);
 
     texture=SDL_CreateTextureFromSurface(renderer, background);
     SDL_RenderCopy(renderer, texture, &rect, &rect);
 
     SDL_DestroyTexture(texture);
     texture=nullptr;
+
+    SDL_RenderDrawLine(renderer, rect.w+1, 0, rect.w+1, rect.h+1);
+    SDL_RenderDrawLine(renderer, 0, rect.h+1, rect.w+1, rect.h+1);
 
     SDL_RenderPresent(renderer);
 }
@@ -89,6 +99,9 @@ void Window::refresh()
 
     SDL_DestroyTexture(texture);
     texture=nullptr;
+
+    SDL_RenderDrawLine(renderer, rect.w+1, 0, rect.w+1, rect.h+1);
+    SDL_RenderDrawLine(renderer, 0, rect.h+1, rect.w+1, rect.h+1);
 
     SDL_RenderPresent(renderer);
 }

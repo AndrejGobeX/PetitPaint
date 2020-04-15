@@ -11,11 +11,15 @@
 	"Formater.h"
 	"Image.h"
 
-1586888215 d:\etf\petitpaint\petitpaint\include\window.h
+1586942856 d:\etf\petitpaint\petitpaint\include\window.h
 	<string>
 	<SDL.h>
+	"Layer.h"
+	<windows.h>
+	<winuser.h>
+	<vector>
 
-1586885478 source:d:\etf\petitpaint\petitpaint\src\window.cpp
+1586889479 source:d:\etf\petitpaint\petitpaint\src\window.cpp
 	"Window.h"
 	<iostream>
 
@@ -35,4 +39,10 @@
 1586863197 source:d:\etf\petitpaint\petitpaint\src\image.cpp
 	"Image.h"
 	<SDL.h>
+
+1586941405 d:\etf\petitpaint\petitpaint\include\layer.h
+	"Image.h"
+
+1586941516 source:d:\etf\petitpaint\petitpaint\src\layer.cpp
+	"Layer.h"
 

@@ -3,6 +3,10 @@
 
 #include<string>
 #include<SDL.h>
+#include"Layer.h"
+#include<windows.h>
+#include<winuser.h>
+#include<vector>
 
 class Window
 {
@@ -36,6 +40,8 @@ class Window
         SDL_Renderer* renderer=nullptr;
 
         SDL_Rect rect;
+
+        std::vector<Layer> layers;
 
         int width, height;
         bool MouseFocus=false;
