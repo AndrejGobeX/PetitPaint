@@ -7,8 +7,6 @@
 #include<windows.h>
 #include<winuser.h>
 #include<vector>
-#include<SDL_syswm.h>
-#include<SDL_image.h>
 
 class Window
 {
@@ -36,12 +34,12 @@ class Window
     private:
         SDL_Window* window=nullptr;
         SDL_Surface* screenSurface=nullptr;
+        SDL_Surface* menu=nullptr;
 
-        SDL_Surface* background=nullptr;
         SDL_Texture* texture=nullptr;
         SDL_Renderer* renderer=nullptr;
 
-        SDL_Rect rect;
+        SDL_Rect rect, rect2, menu_rect;
 
         std::vector<Layer> layers;
 
@@ -49,8 +47,6 @@ class Window
         bool MouseFocus=false;
         bool KeyboardFocus=false;
         bool Minimized=false;
-
-        HMENU menubar=nullptr;
 };
 
 #endif // WINDOW_H
