@@ -39,13 +39,28 @@ Window::Window(const int& SCREEN_HEIGHT, const int& SCREEN_WIDTH): width(SCREEN_
     menu_rect.x=0;
     menu_rect.y=0;
     menu=SDL_LoadBMP("menu\\menu.bmp");
-    SDL_BlitSurface(menu, nullptr, screenSurface, nullptr);
+    //SDL_BlitSurface(menu, nullptr, screenSurface, nullptr);
 
-    texture=SDL_CreateTextureFromSurface(renderer, screenSurface);
+    texture=SDL_CreateTextureFromSurface(renderer, menu);
     SDL_RenderCopy(renderer, texture, &menu_rect, &menu_rect);
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(texture);
     texture=nullptr;
+    clear();
+}
+
+void Window::clear_background()
+{
+    SDL_FillRect(background, nullptr, SDL_MapRGB(screenSurface->format, 0x0, 0x0, 0x0));
+    refresh();
+}
+
+void Window::clear()
+{
+    clear_background();
+    SDL_FillRect(screenSurface, nullptr, SDL_MapRGB(screenSurface->format, 0x0, 0x0, 0x0));
+    //SDL_BlitSurface(menu, nullptr, screenSurface, nullptr);
+    refresh();
 }
 
 Window::~Window()
@@ -56,61 +71,51 @@ Window::~Window()
         SDL_DestroyRenderer(renderer);
         renderer=nullptr;
     }
+    if(menu!=nullptr)
+    {
+        SDL_FreeSurface(menu);
+        menu=nullptr;
+    }
+    if(background!=nullptr)
+    {
+        SDL_FreeSurface(background);
+        background=nullptr;
+    }
     SDL_Quit();
 }
 
 void Window::set_background(std::string path)
 {
-    SDL_Surface* background;
+    if(background!=nullptr)SDL_FreeSurface(background);
     background=SDL_LoadBMP(path.c_str());
     if(background==nullptr)
     {
         std::cout<<"Could not load image. Error: "<<SDL_GetError()<<"\n";
         return;
     }
-    SDL_BlitSurface(background, nullptr, screenSurface, &rect);
-    rect=rect2;
-
-    texture=SDL_CreateTextureFromSurface(renderer, screenSurface);
-    SDL_RenderCopy(renderer, texture, &rect, &rect);
-
-    SDL_DestroyTexture(texture);
-    texture=nullptr;
-
-    SDL_RenderDrawLine(renderer, rect.w+1+100, 0, rect.w+1+100, rect.h+1);
-    SDL_RenderDrawLine(renderer, 100, rect.h+1, rect.w+1+100, rect.h+1);
-    SDL_RenderDrawLine(renderer, 99, 0, 99, rect.h+1);
-
-    SDL_RenderPresent(renderer);
-    SDL_FreeSurface(background);
 }
 
 void Window::set_background(SDL_Surface* surface)
 {
-    SDL_BlitSurface(surface, nullptr, screenSurface, &rect);
-    rect=rect2;
-
-    texture=SDL_CreateTextureFromSurface(renderer, screenSurface);
-    SDL_RenderCopy(renderer, texture, &rect, &rect);
-
-    SDL_DestroyTexture(texture);
-    texture=nullptr;
-
-    SDL_RenderDrawLine(renderer, rect.w+1+100, 0, rect.w+1+100, rect.h+1);
-    SDL_RenderDrawLine(renderer, 100, rect.h+1, rect.w+1+100, rect.h+1);
-    SDL_RenderDrawLine(renderer, 99, 0, 99, rect.h+1);
-
-    SDL_RenderPresent(renderer);
+    SDL_BlitSurface(surface, nullptr, background, nullptr);
 }
 
 void Window::refresh()
 {
     texture=SDL_CreateTextureFromSurface(renderer, screenSurface);
-    rect.x=0;
-    rect.w+=100;
-    SDL_RenderCopy(renderer, texture, &rect, &rect);
-    rect.x=100;
-    rect.w-=100;
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+
+    SDL_DestroyTexture(texture);
+    texture=nullptr;
+
+    texture=SDL_CreateTextureFromSurface(renderer, menu);
+    SDL_RenderCopy(renderer, texture, &menu_rect, &menu_rect);
+
+    SDL_DestroyTexture(texture);
+    texture=nullptr;
+
+    texture=SDL_CreateTextureFromSurface(renderer, background);
+    SDL_RenderCopy(renderer, texture, nullptr, &rect);
 
     SDL_DestroyTexture(texture);
     texture=nullptr;
@@ -174,6 +179,24 @@ void Window::handle_event(SDL_Event &e)
         case SDL_WINDOWEVENT_RESTORED:
             Minimized = false;
             break;
+        }
+    }
+    else if ( e.type == SDL_MOUSEBUTTONUP)
+    {
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+
+        //Menu
+        if(x>0 && x<100)
+        {
+            //New
+            if(y>0 && y<30)
+            {
+                rect2.w=0;
+                rect2.h=0;
+                rect=rect2;
+                clear();
+            }
         }
     }
 }

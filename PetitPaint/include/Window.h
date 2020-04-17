@@ -28,6 +28,8 @@ class Window
         bool isMinimized(){return Minimized;}
 
         void refresh();
+        void clear();
+        void clear_background();
 
     protected:
 
@@ -35,11 +37,12 @@ class Window
         SDL_Window* window=nullptr;
         SDL_Surface* screenSurface=nullptr;
         SDL_Surface* menu=nullptr;
+        SDL_Surface* background=nullptr;
 
         SDL_Texture* texture=nullptr;
         SDL_Renderer* renderer=nullptr;
 
-        SDL_Rect rect, rect2, menu_rect;
+        SDL_Rect rect, rect2, menu_rect, surface_rect;
 
         std::vector<Layer> layers;
 

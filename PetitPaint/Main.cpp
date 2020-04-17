@@ -16,8 +16,7 @@ int main(int argc, char* argv[])
 {
     Window win(SCREEN_HEIGHT, SCREEN_WIDTH);
     win.set_background("samples\\PetitPaint.bmp");
-    Image* img=Formater::read_PAM("samples\\sample3.pam");
-    win.set_background(img->get_surface());
+    win.refresh();
 
     bool n_quit=true;
     SDL_Event e;
@@ -33,8 +32,6 @@ int main(int argc, char* argv[])
             }
         }
     }
-
-    delete img;
 
     return 0;
 }
