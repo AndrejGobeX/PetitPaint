@@ -19,7 +19,7 @@ Window::Window(const int& SCREEN_HEIGHT, const int& SCREEN_WIDTH): width(SCREEN_
     }
 
     screenSurface=SDL_GetWindowSurface(window);
-    SDL_FillRect(screenSurface, nullptr, SDL_MapRGB(screenSurface->format, 0x0, 0x0, 0x0));
+    SDL_FillRect(screenSurface, nullptr, SDL_MapRGBA(screenSurface->format, 0x0, 0x0, 0x0, 0xFF));
     SDL_UpdateWindowSurface(window);
     renderer=SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if(renderer==nullptr)
@@ -46,21 +46,8 @@ Window::Window(const int& SCREEN_HEIGHT, const int& SCREEN_WIDTH): width(SCREEN_
     SDL_RenderPresent(renderer);
     SDL_DestroyTexture(texture);
     texture=nullptr;
-    clear();
-}
 
-void Window::clear_background()
-{
-    SDL_FillRect(background, nullptr, SDL_MapRGB(screenSurface->format, 0x0, 0x0, 0x0));
-    refresh();
-}
-
-void Window::clear()
-{
-    clear_background();
-    SDL_FillRect(screenSurface, nullptr, SDL_MapRGB(screenSurface->format, 0x0, 0x0, 0x0));
-    //SDL_BlitSurface(menu, nullptr, screenSurface, nullptr);
-    refresh();
+    format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
 }
 
 Window::~Window()
@@ -81,21 +68,48 @@ Window::~Window()
         SDL_FreeSurface(background);
         background=nullptr;
     }
+    if(format!=nullptr)
+    {
+        SDL_FreeFormat(format);
+        format=nullptr;
+    }
+    delete_layers();
     SDL_Quit();
+}
+
+void Window::delete_layers()
+{
+    std::for_each(layers.begin(), layers.end(), [](Layer* l){delete l;});
+    layers.clear();
+}
+
+void Window::clear()
+{
+    SDL_FillRect(background, nullptr, SDL_MapRGBA(format, 0x0, 0x0, 0x0, 0xFF));
+}
+
+void Window::swap_background(SDL_Surface* surface)
+{
+    if(background==nullptr)
+    {
+        SDL_FreeSurface(background);
+    }
+    background=surface;
 }
 
 void Window::set_background(std::string path)
 {
-    if(background!=nullptr)SDL_FreeSurface(background);
-    background=SDL_LoadBMP(path.c_str());
-    if(background==nullptr)
+    SDL_Surface* srf=SDL_LoadBMP(path.c_str());
+    if(srf==nullptr)
     {
         std::cout<<"Could not load image. Error: "<<SDL_GetError()<<"\n";
         return;
     }
+    background=SDL_ConvertSurface(srf, format, 0);
+    SDL_FreeSurface(srf);
 }
 
-void Window::set_background(SDL_Surface* surface)
+void Window::blit_to_background(SDL_Surface* surface)
 {
     SDL_BlitSurface(surface, nullptr, background, nullptr);
 }
@@ -125,6 +139,60 @@ void Window::refresh()
     SDL_RenderDrawLine(renderer, 99, 0, 99, rect.h+1);
 
     SDL_RenderPresent(renderer);
+}
+
+void Window::reload()
+{
+    clear();
+    for(Layer* l:layers)
+    {
+        if(l->isVisible())SDL_BlitSurface(l->get_image()->get_surface(), nullptr, background, nullptr);
+    }
+    refresh();
+}
+
+void Window::add(std::string path)
+{
+    SDL_Surface* surface=nullptr;
+    Image* img;
+
+    std::regex bmp("(.*)\u002Ebmp");
+    std::regex pam("(.*)\u002Epam");
+
+    std::smatch match;
+
+    if(regex_match(path, match, bmp))
+    {
+        surface=SDL_LoadBMP(path.c_str());
+        img=new Image(SDL_ConvertSurface(surface, format, 0), surface->w, surface->h, 4);
+        SDL_FreeSurface(surface);
+    }
+    else if(regex_match(path, match, pam))
+    {
+        Image* temp;
+        temp=Formater::read_PAM(path);
+        img=new Image(SDL_ConvertSurface(temp->get_surface(), format, 0), temp->get_width(), temp->get_height(), 4);
+        delete temp;
+    }
+    else
+    {
+        std::cout<<"File type not supported (yet).\n";
+        return;
+    }
+    if(img->get_surface()==nullptr)
+    {
+        std::cout<<"Error processing image.\n";
+        delete img;
+        return;
+    }
+    layers.push_back((new Layer(img, true)));
+
+    rect.h=std::max((unsigned)rect.h, img->get_height());//Resizing background
+    rect.w=std::max((unsigned)rect.w, img->get_width()); //if necessary
+    rect2=rect;
+
+    //Swap new dimensions
+    swap_background(SDL_CreateRGBSurfaceWithFormat(0, rect.w, rect.h, 32, format->format));
 }
 
 void Window::handle_event(SDL_Event &e)
@@ -195,7 +263,23 @@ void Window::handle_event(SDL_Event &e)
                 rect2.w=0;
                 rect2.h=0;
                 rect=rect2;
+                delete_layers();
                 clear();
+                refresh();
+            }
+            //Import
+            if(y>120 && y<150)
+            {
+                std::string s;
+                std::cout<<"Path to file: ";
+                std::cin>>s;
+                add(s);
+                reload();
+            }
+            //Quit
+            if(y>210 && y<240)
+            {
+                n_quit=false;
             }
         }
     }

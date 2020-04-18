@@ -7,6 +7,8 @@
 #include<windows.h>
 #include<winuser.h>
 #include<vector>
+#include"Formater.h"
+#include<regex>
 
 class Window
 {
@@ -17,7 +19,7 @@ class Window
         SDL_Surface* get_surface(){return screenSurface;};
 
         void set_background(std::string path);
-        void set_background(SDL_Surface* surface);
+        void blit_to_background(SDL_Surface* surface);
 
         void handle_event(SDL_Event &e);
 
@@ -26,10 +28,19 @@ class Window
         bool hasMouseFocus(){return MouseFocus;}
         bool hasKeyboardFocus(){return KeyboardFocus;}
         bool isMinimized(){return Minimized;}
+        SDL_PixelFormat* get_format(){return format;}
 
         void refresh();
         void clear();
-        void clear_background();
+        void reload();
+
+        void add(std::string path);
+
+        bool n_quit=true;
+
+        void swap_background(SDL_Surface* surface);
+
+        void delete_layers();
 
     protected:
 
@@ -39,12 +50,14 @@ class Window
         SDL_Surface* menu=nullptr;
         SDL_Surface* background=nullptr;
 
+        SDL_PixelFormat* format=nullptr;
+
         SDL_Texture* texture=nullptr;
         SDL_Renderer* renderer=nullptr;
 
         SDL_Rect rect, rect2, menu_rect, surface_rect;
 
-        std::vector<Layer> layers;
+        std::vector<Layer*> layers;
 
         int width, height;
         bool MouseFocus=false;

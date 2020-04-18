@@ -18,14 +18,13 @@ int main(int argc, char* argv[])
     win.set_background("samples\\PetitPaint.bmp");
     win.refresh();
 
-    bool n_quit=true;
     SDL_Event e;
 
-    while(n_quit)
+    while(win.n_quit)
     {
         while(SDL_PollEvent(&e)!=0)
         {
-            if(e.type==SDL_QUIT)n_quit=false;
+            if(e.type==SDL_QUIT)win.n_quit=false;
             else
             {
                 win.handle_event(e);
