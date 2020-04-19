@@ -151,6 +151,28 @@ void Window::reload()
     refresh();
 }
 
+void Window::out(std::string path)
+{
+    std::regex bmp("(.*)\u002Ebmp");
+    std::regex pam("(.*)\u002Epam");
+
+    std::smatch match;
+
+    if(regex_match(path, match, bmp))
+    {
+        Formater::export_BMP(background, path);
+    }
+    else if(regex_match(path, match, pam))
+    {
+        Formater::export_PAM(background, path);
+    }
+    else
+    {
+        std::cout<<"File type not supported (yet).\n";
+        return;
+    }
+}
+
 void Window::add(std::string path)
 {
     SDL_Surface* surface=nullptr;
@@ -171,8 +193,10 @@ void Window::add(std::string path)
     {
         Image* temp;
         temp=Formater::read_PAM(path);
+        if(temp!=nullptr){
         img=new Image(SDL_ConvertSurface(temp->get_surface(), format, 0), temp->get_width(), temp->get_height(), 4);
         delete temp;
+        }
     }
     else
     {
@@ -275,6 +299,14 @@ void Window::handle_event(SDL_Event &e)
                 std::cin>>s;
                 add(s);
                 reload();
+            }
+            //Export
+            if(y>150 && y<180)
+            {
+                std::string s;
+                std::cout<<"Path to file: ";
+                std::cin>>s;
+                out(s);
             }
             //Quit
             if(y>210 && y<240)

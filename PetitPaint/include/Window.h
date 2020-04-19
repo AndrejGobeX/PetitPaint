@@ -35,6 +35,7 @@ class Window
         void reload();
 
         void add(std::string path);
+        void out(std::string path);
 
         bool n_quit=true;
 

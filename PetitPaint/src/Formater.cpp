@@ -35,7 +35,7 @@ Image* Formater::read_PAM(std::string path)
     std::smatch match;
     std::regex rx_width("WIDTH ([0-9]*)"),
         rx_height("HEIGHT ([0-9]*)"), rx_depth("DEPTH ([0-9]*)"),
-        rx_maxval("MAXVAL ([0-9]*)"), rx_tupltype("TUPLTYPE ([A-Z]*)");
+        rx_maxval("MAXVAL ([0-9]*)"), rx_tupltype("TUPLTYPE ([A-Z]*[\u005F]*[A-Z]*)");
 
     //Check format
     getline(file, s);
@@ -162,4 +162,35 @@ Image* Formater::read_PAM(std::string path)
     Image* image=new Image(image_surface, pixels, width, height, depth);
 
     return image;
+}
+
+void Formater::export_BMP(SDL_Surface* surface, std::string path)
+{
+    if(SDL_SaveBMP(surface, path.c_str())<0)
+    {
+        std::cout<<"Could not export bmp. Error: "<<SDL_GetError()<<"\n";
+    }
+}
+
+void Formater::export_PAM(SDL_Surface* surface, std::string path)
+{
+    std::ofstream file(path.c_str(), std::ios::binary);
+
+    file<<"P7\n";
+    file<<"WIDTH "<<surface->w<<"\n";
+    file<<"HEIGHT "<<surface->h<<"\n";
+    file<<"DEPTH 4\n";
+    file<<"MAXVAL 255\n";
+    file<<"TUPLTYPE RGB_ALPHA\n";
+    file<<"ENDHDR\n";
+
+    char* pixels=(char*)surface->pixels;
+
+    for(unsigned i=0; i<surface->w*surface->h*4; ++i)
+    {
+        file<<pixels[i];
+    }
+    file<<EOF;
+
+    file.close();
 }
