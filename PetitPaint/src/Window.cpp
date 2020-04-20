@@ -1,5 +1,6 @@
 #include "Window.h"
 #include<iostream>
+#include<fstream>
 
 const int INIT_ERROR=1, WINDOW_ERROR=2, RENDER_ERROR=3;
 
@@ -90,7 +91,7 @@ void Window::clear()
 
 void Window::swap_background(SDL_Surface* surface)
 {
-    if(background==nullptr)
+    if(background!=nullptr)
     {
         SDL_FreeSurface(background);
     }
@@ -186,6 +187,11 @@ void Window::add(std::string path)
     if(regex_match(path, match, bmp))
     {
         surface=SDL_LoadBMP(path.c_str());
+        if(surface==nullptr)
+        {
+            std::cout<<"Cannot open file or it doesn't exits. Error: "<<SDL_GetError()<<"\n";
+            return;
+        }
         img=new Image(SDL_ConvertSurface(surface, format, 0), surface->w, surface->h, 4);
         SDL_FreeSurface(surface);
     }
@@ -203,10 +209,10 @@ void Window::add(std::string path)
         std::cout<<"File type not supported (yet).\n";
         return;
     }
-    if(img->get_surface()==nullptr)
+    if(img==nullptr || img->get_surface()==nullptr)
     {
         std::cout<<"Error processing image.\n";
-        delete img;
+        if(img)delete img;
         return;
     }
     layers.push_back((new Layer(img, true)));

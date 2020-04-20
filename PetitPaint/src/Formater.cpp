@@ -22,14 +22,11 @@ Image* Formater::read_PAM(std::string path)
         return nullptr;
     }
 
-    unsigned char*  pixels;
     int    width;
     int    height;
     int    depth;
-    int maxval;
+    int    maxval;
     std::string tupltype;
-
-    Uint32 rmask, gmask, bmask, amask;
 
     std::string s;
     std::smatch match;
@@ -120,48 +117,29 @@ Image* Formater::read_PAM(std::string path)
     //Header end
     getline(file, s);
 
-    #if SDL_BYTEORDER == SDL_BIG_ENDIAN
-    int shift = (tupltype != "RGB_ALPHA") ? 8 : 0;
-    rmask = 0xff000000 >> shift;
-    gmask = 0x00ff0000 >> shift;
-    bmask = 0x0000ff00 >> shift;
-    amask = 0x000000ff >> shift;
-    #else // little endian, like x86
-    rmask = 0x000000ff;
-    gmask = 0x0000ff00;
-    bmask = 0x00ff0000;
-    amask = (tupltype != "RGB_ALPHA") ? 0 : 0xff000000;
-    #endif
-
-    //Array of pixels
-    pixels=new unsigned char[width*height*depth];
-
-    unsigned current_pixel=0;
-
-    while(getline(file, s))
-    {
-        for(unsigned char c:s)
-        {
-            pixels[current_pixel]=0+c;
-            ++current_pixel;
-        }
-    }
-    file.close();
-
-    SDL_Surface* image_surface;
-    image_surface=SDL_CreateRGBSurfaceFrom((void*)pixels, width, height, depth<<3, depth*width,
-                                           rmask, gmask, bmask, amask);
+    SDL_Surface* image_surface=SDL_CreateRGBSurfaceWithFormat(0, width,
+                    height, 32, SDL_PIXELFORMAT_RGBA32);
     if(image_surface==nullptr)
     {
-        std::cout<<"Could not load image. Error: "<<SDL_GetError()<<"\n";
-        delete [] pixels;
-        pixels=nullptr;
+        std::cout<<"Could not create surface. Error: "<<SDL_GetError()<<"\n";
         return nullptr;
     }
 
-    Image* image=new Image(image_surface, pixels, width, height, depth);
+    unsigned char temp[4];
 
-    return image;
+    std::cout<<std::hex;
+    for(long long i=0; i<width*height; ++i)
+    {
+        file.read((char*)&temp, depth);
+        if(depth==3)temp[3]=0xff;
+        ((Uint32*)(image_surface->pixels))[i]=*((Uint32*)temp);
+    }
+
+    file.close();
+
+    Image* img=new Image(image_surface, width, height, depth);
+
+    return img;
 }
 
 void Formater::export_BMP(SDL_Surface* surface, std::string path)
@@ -185,8 +163,8 @@ void Formater::export_PAM(SDL_Surface* surface, std::string path)
     file<<"ENDHDR\n";
 
     char* pixels=(char*)surface->pixels;
-
-    for(unsigned i=0; i<surface->w*surface->h*4; ++i)
+    int i=0;
+    for(i=0; i<surface->w*surface->h*4; ++i)
     {
         file<<pixels[i];
     }

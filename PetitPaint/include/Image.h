@@ -21,7 +21,6 @@ class Image
 
     private:
         SDL_Surface* surface=nullptr;
-        unsigned char* pixels=nullptr;
         unsigned width, height, depth;
 };
 
