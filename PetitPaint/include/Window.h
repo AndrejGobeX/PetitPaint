@@ -22,6 +22,7 @@ class Window
         void blit_to_background(SDL_Surface* surface);
 
         void handle_event(SDL_Event &e);
+        void handle_command(std::string s);
 
         int get_width(){return width;}
         bool get_height(){return height;}

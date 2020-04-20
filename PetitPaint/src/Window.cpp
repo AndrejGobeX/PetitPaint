@@ -225,6 +225,11 @@ void Window::add(std::string path)
     swap_background(SDL_CreateRGBSurfaceWithFormat(0, rect.w, rect.h, 32, format->format));
 }
 
+void Window::handle_command(std::string s)
+{
+
+}
+
 void Window::handle_event(SDL_Event &e)
 {
     if( e.type == SDL_WINDOWEVENT )
@@ -287,6 +292,7 @@ void Window::handle_event(SDL_Event &e)
         //Menu
         if(x>0 && x<100)
         {
+            system("cls");
             //New
             if(y>0 && y<30)
             {
@@ -318,6 +324,14 @@ void Window::handle_event(SDL_Event &e)
             if(y>210 && y<240)
             {
                 n_quit=false;
+            }
+            //Command line input
+            if(y>270 && y<300)
+            {
+                std::string s;
+                std::cout<<"Input: ";
+                std::cin>>s;
+                handle_command(s);
             }
         }
     }

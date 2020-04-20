@@ -11,7 +11,7 @@
 	"Formater.h"
 	"Image.h"
 
-1587297471 d:\etf\petitpaint\petitpaint\include\window.h
+1587399629 d:\etf\petitpaint\petitpaint\include\window.h
 	<string>
 	<SDL.h>
 	"Layer.h"
@@ -41,7 +41,7 @@
 	<iostream>
 	<fstream>
 
-1587395581 source:d:\etf\petitpaint\petitpaint\src\formater.cpp
+1587395994 source:d:\etf\petitpaint\petitpaint\src\formater.cpp
 	"Formater.h"
 	<SDL.h>
 	<iostream>
