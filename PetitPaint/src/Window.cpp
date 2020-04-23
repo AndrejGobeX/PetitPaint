@@ -174,6 +174,7 @@ void Window::reload()
             l->get_image()->set_surface( SDL_CreateRGBSurfaceWithFormat(0, rect.w, rect.h, 32, format->format) );
             SDL_BlitSurface(temp, nullptr, l->get_image()->get_surface(), nullptr);
             SDL_FreeSurface(temp);
+            l->get_image()->refresh();
         }
         if(l->isVisible())SDL_BlitSurface(l->get_image()->get_surface(), nullptr, background, nullptr);
     }
@@ -283,6 +284,21 @@ void Window::add(std::string path)
     swap_background(SDL_CreateRGBSurfaceWithFormat(0, rect.w, rect.h, 32, format->format));
 }
 
+void Window::apply(Operation* operation)
+{
+    for(Layer* layer:layers)
+    {
+        std::vector<Pixel> pixels=
+            Formater::surface_to_pixels(layer->get_image()->get_surface());
+
+        (*operation)(pixels, layer->get_image()->get_surface()->w);
+
+        SDL_FreeSurface(layer->get_image()->get_surface());
+        layer->get_image()->set_surface(Formater::pixels_to_surface(pixels,
+                    layer->get_image()->get_width(), layer->get_image()->get_height()));
+    }
+}
+
 void Window::handle_command(std::string s)
 {
     std::regex togglel("toggle -l ([0-9]+)");
@@ -291,8 +307,15 @@ void Window::handle_command(std::string s)
     std::regex mksel("mksel ([a-zA-Z0-9_]+) -n ([0-9]+)");
     std::regex rm("rm ([0-9]+)");
     std::regex pwsl("pwsl \\[Y/n\\] ([Y/n])");
+    std::regex op("op ([a-z]+)");
+    std::regex opp("op ([a-z]+) ([0-9]+)");
+    std::regex cls("cls");
 
     std::smatch match;
+    if(regex_match(s, match, cls))
+    {
+        system("cls");
+    }
     if(regex_match(s, match, pwsl))
     {
         if(match[1].str()=="n")
@@ -362,6 +385,94 @@ void Window::handle_command(std::string s)
         }
         delete layers[layer];
         layers.erase(layers.begin()+layer);
+    }
+    if(regex_match(s, match, opp))
+    {
+        int par=atoi(match[2].str().c_str());
+        s=match[1].str();
+        if(s=="add")
+        {
+            Operation o("add", &selections, _add);
+            o(par);
+            apply(&o);
+        }
+        if(s=="sub")
+        {
+            Operation o("sub", &selections, _sub);
+            o(par);
+            apply(&o);
+        }
+        if(s=="isb")
+        {
+            Operation o("isb", &selections, _isb);
+            o(par);
+            apply(&o);
+        }
+        if(s=="mul")
+        {
+            Operation o("mul", &selections, _mul);
+            o(par);
+            apply(&o);
+        }
+        if(s=="idv")
+        {
+            Operation o("idv", &selections, _idv);
+            o(par);
+            apply(&o);
+        }
+        if(s=="div")
+        {
+            Operation o("div", &selections, _div);
+            o(par);
+            apply(&o);
+        }
+        if(s=="pow")
+        {
+            Operation o("pow", &selections, _pow);
+            o(par);
+            apply(&o);
+        }
+        if(s=="max")
+        {
+            Operation o("max", &selections, _max);
+            o(par);
+            apply(&o);
+        }
+        if(s=="min")
+        {
+            Operation o("min", &selections, _min);
+            o(par);
+            apply(&o);
+        }
+    }
+    if(regex_match(s, match, op))
+    {
+        s=match[1].str();
+        if(s=="log")
+        {
+            Operation o("log", &selections, _log);
+            apply(&o);
+        }
+        if(s=="abs")
+        {
+            Operation o("abs", &selections, _abs);
+            apply(&o);
+        }
+        if(s=="inv")
+        {
+            Operation o("inv", &selections, _inv);
+            apply(&o);
+        }
+        if(s=="grs")
+        {
+            Operation o("grs", &selections, _grs);
+            apply(&o);
+        }
+        if(s=="baw")
+        {
+            Operation o("baw", &selections, _baw);
+            apply(&o);
+        }
     }
     reload();
 }

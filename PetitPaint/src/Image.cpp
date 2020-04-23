@@ -15,3 +15,9 @@ Image::~Image()
         surface=nullptr;
     }
 }
+
+void Image::refresh()
+{
+    width=surface->w;
+    height=surface->h;
+}

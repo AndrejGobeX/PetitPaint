@@ -18,6 +18,8 @@ class Image
         unsigned get_height(){return height;}
         unsigned get_depth(){return depth;}
 
+        void refresh();
+
     protected:
 
     private:

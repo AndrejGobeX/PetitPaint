@@ -10,6 +10,7 @@
 #include"Formater.h"
 #include<regex>
 #include"Selection.h"
+#include"Operation.h"
 
 class Window
 {
@@ -44,6 +45,8 @@ class Window
         void swap_background(SDL_Surface* surface);
 
         void delete_layers();
+
+        void apply(Operation* operation);
 
     protected:
 

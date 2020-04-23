@@ -127,7 +127,6 @@ Image* Formater::read_PAM(std::string path)
 
     unsigned char temp[4];
 
-    std::cout<<std::hex;
     for(long long i=0; i<width*height; ++i)
     {
         file.read((char*)&temp, depth);
@@ -171,4 +170,39 @@ void Formater::export_PAM(SDL_Surface* surface, std::string path)
     file<<EOF;
 
     file.close();
+}
+
+std::vector<Pixel> Formater::surface_to_pixels(SDL_Surface* surface)
+{
+    std::vector<Pixel> vp;
+    Pixel p;
+    Uint32* temp;
+    for(int i=0; i<surface->w*surface->h; ++i)
+    {
+        temp=((Uint32*)(surface->pixels))+i;
+        p.R=((unsigned char*)temp)[0];
+        p.G=((unsigned char*)temp)[1];
+        p.B=((unsigned char*)temp)[2];
+        p.A=((unsigned char*)temp)[3];
+        p.indx=i;
+        vp.push_back(p);
+    }
+    return vp;
+}
+
+SDL_Surface* Formater::pixels_to_surface(std::vector<Pixel> pixels, int w, int h)
+{
+    SDL_Surface* surface=SDL_CreateRGBSurfaceWithFormat(0, w, h, 32,
+                                                SDL_PIXELFORMAT_RGBA32);
+    unsigned char temp[4];
+    for(int i=0; i<surface->w*surface->h; ++i)
+    {
+        pixels[i].ceil_floor();
+        temp[0]=pixels[i].R;
+        temp[1]=pixels[i].G;
+        temp[2]=pixels[i].B;
+        temp[3]=pixels[i].A;
+        ((Uint32*)(surface->pixels))[i]=*((Uint32*)temp);
+    }
+    return surface;
 }
