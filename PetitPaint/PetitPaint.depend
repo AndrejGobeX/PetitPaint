@@ -11,7 +11,7 @@
 	"Formater.h"
 	"Image.h"
 
-1587399629 d:\etf\petitpaint\petitpaint\include\window.h
+1587576432 d:\etf\petitpaint\petitpaint\include\window.h
 	<string>
 	<SDL.h>
 	"Layer.h"
@@ -20,26 +20,20 @@
 	<vector>
 	"Formater.h"
 	<regex>
+	"Selection.h"
 
-1587223004 d:\etf\petitpaint\petitpaint\include\layer.h
+1587497410 d:\etf\petitpaint\petitpaint\include\layer.h
 	"Image.h"
 
-1587395952 d:\etf\petitpaint\petitpaint\include\image.h
+1587496384 d:\etf\petitpaint\petitpaint\include\image.h
 
 1587285769 d:\etf\petitpaint\petitpaint\include\formater.h
 	<string>
 
-1587395941 source:d:\etf\petitpaint\petitpaint\src\image.cpp
-	"Image.h"
+1587577477 d:\etf\petitpaint\petitpaint\include\selection.h
 	<SDL.h>
-
-1586941516 source:d:\etf\petitpaint\petitpaint\src\layer.cpp
-	"Layer.h"
-
-1587391988 source:d:\etf\petitpaint\petitpaint\src\window.cpp
-	"Window.h"
-	<iostream>
-	<fstream>
+	<vector>
+	<string>
 
 1587395994 source:d:\etf\petitpaint\petitpaint\src\formater.cpp
 	"Formater.h"
@@ -48,4 +42,25 @@
 	<fstream>
 	<regex>
 	"Image.h"
+
+1587395941 source:d:\etf\petitpaint\petitpaint\src\image.cpp
+	"Image.h"
+	<SDL.h>
+
+1586941516 source:d:\etf\petitpaint\petitpaint\src\layer.cpp
+	"Layer.h"
+
+1587577072 source:d:\etf\petitpaint\petitpaint\src\selection.cpp
+	"Selection.h"
+
+1587578436 source:d:\etf\petitpaint\petitpaint\src\window.cpp
+	"Window.h"
+	<iostream>
+	<fstream>
+
+1587635978 source:d:\etf\petitpaint\petitpaint\src\operation.cpp
+	"Operation.h"
+
+1587638405 d:\etf\petitpaint\petitpaint\include\operation.h
+	<SDL.h>
 

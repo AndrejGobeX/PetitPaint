@@ -9,6 +9,7 @@
 #include<vector>
 #include"Formater.h"
 #include<regex>
+#include"Selection.h"
 
 class Window
 {
@@ -57,14 +58,20 @@ class Window
         SDL_Texture* texture=nullptr;
         SDL_Renderer* renderer=nullptr;
 
-        SDL_Rect rect, rect2, menu_rect, surface_rect;
+        SDL_Rect rect, rect2, menu_rect, surface_rect, selection_rect;
 
         std::vector<Layer*> layers;
+        std::vector<Selection> selections;
+
+        bool preview_sel=true;
 
         int width, height;
         bool MouseFocus=false;
         bool KeyboardFocus=false;
         bool Minimized=false;
+
+        bool selection=false;
+        int sx1, sx2;
 };
 
 #endif // WINDOW_H

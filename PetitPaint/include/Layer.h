@@ -14,6 +14,7 @@ class Layer
         void set_delete_after(bool _delete_after){delete_after=_delete_after;}
 
         bool isVisible(){return visible;}
+        void setVisible(bool _visible){visible=_visible;}
 
     protected:
 

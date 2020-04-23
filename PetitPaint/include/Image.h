@@ -13,6 +13,7 @@ class Image
         virtual ~Image();
 
         SDL_Surface* get_surface(){return surface;}
+        void set_surface(SDL_Surface* _surface){surface=_surface;}
         unsigned get_width(){return width;}
         unsigned get_height(){return height;}
         unsigned get_depth(){return depth;}

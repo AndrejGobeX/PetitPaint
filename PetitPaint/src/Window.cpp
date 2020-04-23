@@ -139,6 +139,26 @@ void Window::refresh()
     SDL_RenderDrawLine(renderer, 100, rect.h+1, rect.w+1+100, rect.h+1);
     SDL_RenderDrawLine(renderer, 99, 0, 99, rect.h+1);
 
+    SDL_SetRenderDrawColor(renderer, 0x00, 0xAA, 0x11, 0x22);
+
+    if(preview_sel)
+    {
+        //Selections
+        for(Selection sel:selections)
+        {
+            if(sel.isEnabled())
+            {
+                for_each(sel.rects.begin(), sel.rects.end(),
+                [this](SDL_Rect r)
+                {
+                    SDL_RenderDrawRect(renderer, &r);
+                });
+            }
+        }
+    }
+
+    SDL_SetRenderDrawColor(renderer, 0x00, 0xAA, 0xAA, 0xFF);
+
     SDL_RenderPresent(renderer);
 }
 
@@ -147,6 +167,14 @@ void Window::reload()
     clear();
     for(Layer* l:layers)
     {
+        //Resize layer
+        if(l->get_image()->get_surface()->w<rect.w || l->get_image()->get_surface()->h<rect.h)
+        {
+            SDL_Surface* temp=l->get_image()->get_surface();
+            l->get_image()->set_surface( SDL_CreateRGBSurfaceWithFormat(0, rect.w, rect.h, 32, format->format) );
+            SDL_BlitSurface(temp, nullptr, l->get_image()->get_surface(), nullptr);
+            SDL_FreeSurface(temp);
+        }
         if(l->isVisible())SDL_BlitSurface(l->get_image()->get_surface(), nullptr, background, nullptr);
     }
     refresh();
@@ -181,6 +209,8 @@ void Window::add(std::string path)
 
     std::regex bmp("(.*)\u002Ebmp");
     std::regex pam("(.*)\u002Epam");
+    std::regex no("empty");
+    std::regex nowh("empty -w ([0-9]+) -h ([0-9]+)");
 
     std::smatch match;
 
@@ -203,6 +233,34 @@ void Window::add(std::string path)
         img=new Image(SDL_ConvertSurface(temp->get_surface(), format, 0), temp->get_width(), temp->get_height(), 4);
         delete temp;
         }
+    }
+    else if(regex_match(path, match, nowh))
+    {
+        surface=SDL_CreateRGBSurfaceWithFormat(0, atoi(match[1].str().c_str()),
+                        atoi(match[2].str().c_str()), 32, format->format);
+        if(surface==nullptr)
+        {
+            std::cout<<"Cannot create layer. Error: "<<SDL_GetError()<<"\n";
+            return;
+        }
+        img=new Image(SDL_ConvertSurface(surface, format, 0), surface->w, surface->h, 4);
+        SDL_FreeSurface(surface);
+    }
+    else if(regex_match(path, match, no))
+    {
+        if(layers.size()==0)
+        {
+            std::cout<<"First layer dimensions must be specified, use: empty -w width -h height\n";
+            return;
+        }
+        surface=SDL_CreateRGBSurfaceWithFormat(0, rect.w, rect.h, 32, format->format);
+        if(surface==nullptr)
+        {
+            std::cout<<"Cannot create layer. Error: "<<SDL_GetError()<<"\n";
+            return;
+        }
+        img=new Image(SDL_ConvertSurface(surface, format, 0), surface->w, surface->h, 4);
+        SDL_FreeSurface(surface);
     }
     else
     {
@@ -227,7 +285,85 @@ void Window::add(std::string path)
 
 void Window::handle_command(std::string s)
 {
+    std::regex togglel("toggle -l ([0-9]+)");
+    std::regex toggles("toggle -s ([0-9]+)");
+    std::regex toggless("toggle -s -l ([a-zA-Z0-9]+)");
+    std::regex mksel("mksel ([a-zA-Z0-9_]+) -n ([0-9]+)");
+    std::regex rm("rm ([0-9]+)");
+    std::regex pwsl("pwsl \\[Y/n\\] ([Y/n])");
 
+    std::smatch match;
+    if(regex_match(s, match, pwsl))
+    {
+        if(match[1].str()=="n")
+            preview_sel=false;
+        else
+            preview_sel=true;
+    }
+    if(regex_match(s, match, togglel))
+    {
+        unsigned layer=atoi(match[1].str().c_str());
+        layer=layers.size()-layer;
+        if(layer>=layers.size() || layer<0)
+        {
+            std::cout<<"Index out of bounds. Current layer count: "<<layers.size()<<"\n";
+            return;
+        }
+        layers[layer]->setVisible(!layers[layer]->isVisible());
+    }
+    if(regex_match(s, match, toggless))
+    {
+        std::string sel=match[1].str();
+        for(Selection& sele:selections)
+        {
+            if(sele.label==sel)
+                sele.setEnabled(!sele.isEnabled());
+        }
+    }
+    if(regex_match(s, match, toggles))
+    {
+        unsigned sel=atoi(match[1].str().c_str());
+        sel=selections.size()-sel;
+        if(sel>=selections.size() || sel<0)
+        {
+            std::cout<<"Index out of bounds. Current selection count: "<<selections.size()<<"\n";
+            return;
+        }
+        selections[sel].setEnabled(!selections[sel].isEnabled());
+    }
+    if(regex_match(s, match, mksel))
+    {
+        Selection sel;
+        sel.label=match[1].str();
+        for(int i=0; i<atoi(match[2].str().c_str()); ++i)
+        {
+            std::cout<<"Rect "<<i+1<<" x y w h: ";
+            int x, y, w, h;
+            std::cin>>x>>y>>w>>h;
+            SDL_Rect r;
+
+            r.x=x+100;
+            r.y=y;
+            r.w=w;
+            r.h=h;
+
+            sel.rects.push_back(r);
+        }
+        selections.push_back(sel);
+    }
+    if(regex_match(s, match, rm))
+    {
+        unsigned layer=atoi(match[1].str().c_str());
+        layer=layers.size()-layer;
+        if(layer>=layers.size() || layer<0)
+        {
+            std::cout<<"Index out of bounds. Current layer count: "<<layers.size()<<"\n";
+            return;
+        }
+        delete layers[layer];
+        layers.erase(layers.begin()+layer);
+    }
+    reload();
 }
 
 void Window::handle_event(SDL_Event &e)
@@ -289,10 +425,34 @@ void Window::handle_event(SDL_Event &e)
         int x, y;
         SDL_GetMouseState(&x, &y);
 
-        //Menu
-        if(x>0 && x<100)
+        if(selection && x>100 && x<rect.w+100 && y>0 && y<rect.h)
         {
-            system("cls");
+            selection_rect.w=abs(selection_rect.x-x);
+            selection_rect.h=abs(selection_rect.y-y);
+            selection_rect.x=std::min(selection_rect.x, x);
+            selection_rect.y=std::min(selection_rect.y, y);
+            selection=false;
+
+            selections.push_back(Selection(selection_rect));
+
+            std::cout<<"Selection label: ";
+            std::string s;
+            std::getline(std::cin, s);
+            selections[selections.size()-1].label=s;
+
+            std::cout<<"Selection made.\n";
+
+            refresh();
+        }
+        else if(selection)
+        {
+            std::cout<<"Selection cancelled.\n";
+            selection=!selection;
+        }
+
+        //Menu
+        if(!selection && x>0 && x<100)
+        {
             //New
             if(y>0 && y<30)
             {
@@ -300,6 +460,7 @@ void Window::handle_event(SDL_Event &e)
                 rect2.h=0;
                 rect=rect2;
                 delete_layers();
+                selections.clear();
                 clear();
                 refresh();
             }
@@ -308,7 +469,7 @@ void Window::handle_event(SDL_Event &e)
             {
                 std::string s;
                 std::cout<<"Path to file: ";
-                std::cin>>s;
+                std::getline(std::cin, s);
                 add(s);
                 reload();
             }
@@ -317,7 +478,7 @@ void Window::handle_event(SDL_Event &e)
             {
                 std::string s;
                 std::cout<<"Path to file: ";
-                std::cin>>s;
+                std::getline(std::cin, s);
                 out(s);
             }
             //Quit
@@ -330,9 +491,25 @@ void Window::handle_event(SDL_Event &e)
             {
                 std::string s;
                 std::cout<<"Input: ";
-                std::cin>>s;
+                std::getline(std::cin, s);
                 handle_command(s);
             }
+        }
+
+    }
+    else if( e.type == SDL_MOUSEBUTTONDOWN)
+    {
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+
+        //Selection
+        if(!selection && x>100 && x<rect.w+100 && y>0 && y<rect.h)
+        {
+            selection=true;
+            selection_rect.x=x;
+            selection_rect.y=y;
+
+            std::cout<<"Selection begin.\n";
         }
     }
 }
