@@ -15,8 +15,10 @@ class Operation
         Operation(std::string _label, std::vector<Selection>* _selections, Fun _f);
         virtual ~Operation();
 
-        virtual void operator()(int _param){par=_param;}
+        void operator()(int _param){par=_param;}
         virtual void operator()(std::vector<Pixel>& pixels, int w);
+
+        virtual std::string get_label(){return label;}
 
     protected:
 

@@ -1,6 +1,7 @@
 #include "Window.h"
 #include<iostream>
 #include<fstream>
+#include<string>
 
 const int INIT_ERROR=1, WINDOW_ERROR=2, RENDER_ERROR=3;
 
@@ -75,6 +76,7 @@ Window::~Window()
         format=nullptr;
     }
     delete_layers();
+    delete_composites();
     SDL_Quit();
 }
 
@@ -82,6 +84,12 @@ void Window::delete_layers()
 {
     std::for_each(layers.begin(), layers.end(), [](Layer* l){delete l;});
     layers.clear();
+}
+
+void Window::delete_composites()
+{
+    std::for_each(composites.begin(), composites.end(), [](CompositeOperation* l){delete l;});
+    composites.clear();
 }
 
 void Window::clear()
@@ -309,6 +317,7 @@ void Window::handle_command(std::string s)
     std::regex pwsl("pwsl \\[Y/n\\] ([Y/n])");
     std::regex op("op ([a-z]+)");
     std::regex opp("op ([a-z]+) ([0-9]+)");
+    std::regex opc("op -c ([a-z]+) -n ([0-9]+) (..)");
     std::regex cls("cls");
 
     std::smatch match;
@@ -316,14 +325,14 @@ void Window::handle_command(std::string s)
     {
         system("cls");
     }
-    if(regex_match(s, match, pwsl))
+    else if(regex_match(s, match, pwsl))
     {
         if(match[1].str()=="n")
             preview_sel=false;
         else
             preview_sel=true;
     }
-    if(regex_match(s, match, togglel))
+    else if(regex_match(s, match, togglel))
     {
         unsigned layer=atoi(match[1].str().c_str());
         layer=layers.size()-layer;
@@ -334,7 +343,7 @@ void Window::handle_command(std::string s)
         }
         layers[layer]->setVisible(!layers[layer]->isVisible());
     }
-    if(regex_match(s, match, toggless))
+    else if(regex_match(s, match, toggless))
     {
         std::string sel=match[1].str();
         for(Selection& sele:selections)
@@ -343,7 +352,7 @@ void Window::handle_command(std::string s)
                 sele.setEnabled(!sele.isEnabled());
         }
     }
-    if(regex_match(s, match, toggles))
+    else if(regex_match(s, match, toggles))
     {
         unsigned sel=atoi(match[1].str().c_str());
         sel=selections.size()-sel;
@@ -354,7 +363,7 @@ void Window::handle_command(std::string s)
         }
         selections[sel].setEnabled(!selections[sel].isEnabled());
     }
-    if(regex_match(s, match, mksel))
+    else if(regex_match(s, match, mksel))
     {
         Selection sel;
         sel.label=match[1].str();
@@ -373,8 +382,9 @@ void Window::handle_command(std::string s)
             sel.rects.push_back(r);
         }
         selections.push_back(sel);
+        std::getchar();
     }
-    if(regex_match(s, match, rm))
+    else if(regex_match(s, match, rm))
     {
         unsigned layer=atoi(match[1].str().c_str());
         layer=layers.size()-layer;
@@ -386,7 +396,137 @@ void Window::handle_command(std::string s)
         delete layers[layer];
         layers.erase(layers.begin()+layer);
     }
-    if(regex_match(s, match, opp))
+    else if(regex_match(s, match, opc))
+    {
+        std::string lbl=match[1].str();
+        int n=atoi(match[2].str().c_str());
+        std::string keep=match[3].str();
+        if(n<1)
+        {
+            std::cout<<"You're kidding, right?\n";
+            return;
+        }
+
+        CompositeOperation* co=new CompositeOperation(lbl, &selections);
+        for(int i=0; i<n; ++i)
+        {
+            std::cout<<"Operation "<<i+1<<":\n\t";
+            std::getline(std::cin, s);
+
+            if(regex_match(s, match, opp))
+            {
+                int par=atoi(match[2].str().c_str());
+                s=match[1].str();
+                if(s=="add")
+                {
+                    Operation* o=new Operation("add", &selections, _add);
+                    (*o)(par);
+                    co->push_back(o);
+                }
+                else if(s=="sub")
+                {
+                    Operation* o=new Operation("sub", &selections, _sub);
+                    (*o)(par);
+                    co->push_back(o);
+                }
+                else if(s=="isb")
+                {
+                    Operation* o=new Operation("isb", &selections, _isb);
+                    (*o)(par);
+                    co->push_back(o);
+                }
+                else if(s=="mul")
+                {
+                    Operation* o=new Operation("mul", &selections, _mul);
+                    (*o)(par);
+                    co->push_back(o);
+                }
+                else if(s=="idv")
+                {
+                    Operation* o=new Operation("idv", &selections, _idv);
+                    (*o)(par);
+                    co->push_back(o);
+                }
+                else if(s=="div")
+                {
+                    Operation* o=new Operation("div", &selections, _div);
+                    (*o)(par);
+                    co->push_back(o);
+                }
+                else if(s=="pow")
+                {
+                    Operation* o=new Operation("pow", &selections, _pow);
+                    (*o)(par);
+                    co->push_back(o);
+                }
+                else if(s=="max")
+                {
+                    Operation* o=new Operation("max", &selections, _max);
+                    (*o)(par);
+                    co->push_back(o);
+                }
+                else if(s=="min")
+                {
+                    Operation* o=new Operation("min", &selections, _min);
+                    (*o)(par);
+                    co->push_back(o);
+                }
+                else
+                {
+                    std::cout<<"Unrecognized operation\n";
+                    --i;
+                }
+            }
+            else if(regex_match(s, match, op))
+            {
+                s=match[1].str();
+                if(s=="log")
+                {
+                    Operation* o=new Operation("log", &selections, _log);
+                    co->push_back(o);
+                }
+                else if(s=="abs")
+                {
+                    Operation* o=new Operation("abs", &selections, _abs);
+                    co->push_back(o);
+                }
+                else if(s=="inv")
+                {
+                    Operation* o=new Operation("inv", &selections, _inv);
+                    co->push_back(o);
+                }
+                else if(s=="grs")
+                {
+                    Operation* o=new Operation("grs", &selections, _grs);
+                    co->push_back(o);
+                }
+                else if(s=="baw")
+                {
+                    Operation* o=new Operation("baw", &selections, _baw);
+                    co->push_back(o);
+                }
+                else if(s=="med")
+                {
+                    Operation* o=new Operation("med", &selections, nullptr);
+                    co->push_back(o);
+                }
+                else
+                {
+                    std::cout<<"Unrecognized operation\n";
+                    --i;
+                }
+            }
+            else
+            {
+                std::cout<<"Unrecognized operation (forgot op?).\n";
+                --i;
+            }
+        }
+        apply(co);
+        if(keep=="-k")composites.push_back(co);
+        else delete co;
+    }
+    else if(regex_match(s, match, opp))
     {
         int par=atoi(match[2].str().c_str());
         s=match[1].str();
@@ -396,56 +536,60 @@ void Window::handle_command(std::string s)
             o(par);
             apply(&o);
         }
-        if(s=="sub")
+        else if(s=="sub")
         {
             Operation o("sub", &selections, _sub);
             o(par);
             apply(&o);
         }
-        if(s=="isb")
+        else if(s=="isb")
         {
             Operation o("isb", &selections, _isb);
             o(par);
             apply(&o);
         }
-        if(s=="mul")
+        else if(s=="mul")
         {
             Operation o("mul", &selections, _mul);
             o(par);
             apply(&o);
         }
-        if(s=="idv")
+        else if(s=="idv")
         {
             Operation o("idv", &selections, _idv);
             o(par);
             apply(&o);
         }
-        if(s=="div")
+        else if(s=="div")
         {
             Operation o("div", &selections, _div);
             o(par);
             apply(&o);
         }
-        if(s=="pow")
+        else if(s=="pow")
         {
             Operation o("pow", &selections, _pow);
             o(par);
             apply(&o);
         }
-        if(s=="max")
+        else if(s=="max")
         {
             Operation o("max", &selections, _max);
             o(par);
             apply(&o);
         }
-        if(s=="min")
+        else if(s=="min")
         {
             Operation o("min", &selections, _min);
             o(par);
             apply(&o);
         }
+        else
+        {
+            std::cout<<"Unrecognized operation\n";
+        }
     }
-    if(regex_match(s, match, op))
+    else if(regex_match(s, match, op))
     {
         s=match[1].str();
         if(s=="log")
@@ -453,25 +597,44 @@ void Window::handle_command(std::string s)
             Operation o("log", &selections, _log);
             apply(&o);
         }
-        if(s=="abs")
+        else if(s=="abs")
         {
             Operation o("abs", &selections, _abs);
             apply(&o);
         }
-        if(s=="inv")
+        else if(s=="inv")
         {
             Operation o("inv", &selections, _inv);
             apply(&o);
         }
-        if(s=="grs")
+        else if(s=="grs")
         {
             Operation o("grs", &selections, _grs);
             apply(&o);
         }
-        if(s=="baw")
+        else if(s=="baw")
         {
             Operation o("baw", &selections, _baw);
             apply(&o);
+        }
+        else if(s=="med")
+        {
+            Operation o("med", &selections, nullptr);
+            apply(&o);
+        }
+        else
+        {
+            bool yes=true;
+            for(CompositeOperation* co:composites)
+            {
+                if(co->get_label()==s)
+                {
+                    apply(co);
+                    yes=false;
+                    break;
+                }
+            }
+            if(yes)std::cout<<"Unrecognized operation\n";
         }
     }
     reload();

@@ -13,8 +13,13 @@ Operation::~Operation()
 
 void Operation::operator()(std::vector<Pixel>& pixels, int w)
 {
-    int x, y;
-    bool yes, mega_yes=true;
+    int x, y; int h=pixels.size()/w;
+    std::vector<Pixel> c_pixels;
+
+    bool yes, mega_yes=true, med=false;
+    if(label=="med")med=true;
+    if(med)c_pixels=pixels;
+
     if(selections->size()==0)mega_yes=true;
     else
     {
@@ -49,7 +54,42 @@ void Operation::operator()(std::vector<Pixel>& pixels, int w)
         }
         if(!yes)continue;
 
-        (*f)(p, par);
+        if(!med)(*f)(p, par);
+        else
+        {
+            int r=p.R, g=p.G, b=p.B, c=1;
+            if(x>0)
+            {
+                c++;
+                r+=c_pixels[p.indx-1].R;
+                g+=c_pixels[p.indx-1].G;
+                b+=c_pixels[p.indx-1].B;
+            }
+            if(x<w-1)
+            {
+                c++;
+                r+=c_pixels[p.indx+1].R;
+                g+=c_pixels[p.indx+1].G;
+                b+=c_pixels[p.indx+1].B;
+            }
+            if(y>0)
+            {
+                c++;
+                r+=c_pixels[p.indx-w].R;
+                g+=c_pixels[p.indx-w].G;
+                b+=c_pixels[p.indx-w].B;
+            }
+            if(y<h-1)
+            {
+                c++;
+                r+=c_pixels[p.indx+w].R;
+                g+=c_pixels[p.indx+w].G;
+                b+=c_pixels[p.indx+w].B;
+            }
+            p.R=r/c;
+            p.G=g/c;
+            p.B=b/c;
+        }
     }
 }
 

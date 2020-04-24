@@ -11,6 +11,7 @@
 #include<regex>
 #include"Selection.h"
 #include"Operation.h"
+#include"CompositeOperation.h"
 
 class Window
 {
@@ -45,6 +46,7 @@ class Window
         void swap_background(SDL_Surface* surface);
 
         void delete_layers();
+        void delete_composites();
 
         void apply(Operation* operation);
 
@@ -65,6 +67,7 @@ class Window
 
         std::vector<Layer*> layers;
         std::vector<Selection> selections;
+        std::list<CompositeOperation*> composites;
 
         bool preview_sel=true;
 
