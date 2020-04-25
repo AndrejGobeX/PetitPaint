@@ -9,7 +9,7 @@ CompositeOperation::CompositeOperation(std::string _label, std::vector<Selection
 
 CompositeOperation::~CompositeOperation()
 {
-    std::for_each(operations.begin(), operations.end(), [](Operation* o){delete o;});
+    std::for_each(operations.begin(), operations.end(), [](Operation* o){if(o->get_class()==0)delete o;});
     operations.clear();
 }
 
@@ -25,14 +25,14 @@ std::string CompositeOperation::get_all_ops()
 {
     std::string s="";
     s+=get_label();
-    s+=":[ ";
+    s+=" -c ";
 
     for(Operation* o:operations)
     {
-        s+=o->get_label();
-        s+=", ";
+        s+=o->get_all_ops();
+        s+=" ";
     }
-    s+="] ";
+    s+="-e";
     return s;
 }
 

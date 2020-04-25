@@ -194,3 +194,11 @@ void _baw(Pixel& pixel, int p)
     pixel.B=avg<127?0:255;
 }
 
+void _col(Pixel& pixel, int p)
+{
+    pixel.R=(p&0xff000000)>>24;
+    pixel.G=(p&0x00ff0000)>>16;
+    pixel.B=(p&0x0000ff00)>>8;
+    pixel.A=(p&0x000000ff);
+}
+

@@ -1,7 +1,7 @@
 # depslib dependency file v1.0
 1586706269 source:d:\etf\petitpaint\petitpaint\icon.rc
 
-1587220187 source:d:\etf\petitpaint\petitpaint\main.cpp
+1587805572 source:d:\etf\petitpaint\petitpaint\main.cpp
 	<iostream>
 	<SDL.h>
 	"Window.h"
@@ -11,7 +11,7 @@
 	"Formater.h"
 	"Image.h"
 
-1587728440 d:\etf\petitpaint\petitpaint\include\window.h
+1587821567 d:\etf\petitpaint\petitpaint\include\window.h
 	<string>
 	<SDL.h>
 	"Layer.h"
@@ -29,10 +29,11 @@
 
 1587674483 d:\etf\petitpaint\petitpaint\include\image.h
 
-1587668148 d:\etf\petitpaint\petitpaint\include\formater.h
+1587820880 d:\etf\petitpaint\petitpaint\include\formater.h
 	<string>
 	"Pixel.h"
 	<vector>
+	"Selection.h"
 
 1587670140 d:\etf\petitpaint\petitpaint\include\pixel.h
 
@@ -41,28 +42,31 @@
 	<vector>
 	<string>
 
-1587723398 d:\etf\petitpaint\petitpaint\include\operation.h
+1587821643 d:\etf\petitpaint\petitpaint\include\operation.h
 	"Pixel.h"
 	<vector>
 	<string>
 	"Selection.h"
 	<cmath>
+	<algorithm>
 
-1587728718 d:\etf\petitpaint\petitpaint\include\compositeoperation.h
+1587821651 d:\etf\petitpaint\petitpaint\include\compositeoperation.h
 	"Operation.h"
 	<list>
 
-1587728704 source:d:\etf\petitpaint\petitpaint\src\compositeoperation.cpp
+1587811854 source:d:\etf\petitpaint\petitpaint\src\compositeoperation.cpp
 	"CompositeOperation.h"
 	<algorithm>
 
-1587670179 source:d:\etf\petitpaint\petitpaint\src\formater.cpp
+1587821262 source:d:\etf\petitpaint\petitpaint\src\formater.cpp
 	"Formater.h"
 	<SDL.h>
 	<iostream>
 	<fstream>
 	<regex>
 	"Image.h"
+	"CompositeOperation.h"
+	<string>
 
 1587674501 source:d:\etf\petitpaint\petitpaint\src\image.cpp
 	"Image.h"
@@ -71,7 +75,7 @@
 1586941516 source:d:\etf\petitpaint\petitpaint\src\layer.cpp
 	"Layer.h"
 
-1587720666 source:d:\etf\petitpaint\petitpaint\src\operation.cpp
+1587804235 source:d:\etf\petitpaint\petitpaint\src\operation.cpp
 	"Operation.h"
 
 1587668135 source:d:\etf\petitpaint\petitpaint\src\pixel.cpp
@@ -80,4 +84,10 @@
 
 1587577072 source:d:\etf\petitpaint\petitpaint\src\selection.cpp
 	"Selection.h"
+
+1587822029 source:d:\etf\petitpaint\petitpaint\src\window.cpp
+	"Window.h"
+	<iostream>
+	<fstream>
+	<string>
 

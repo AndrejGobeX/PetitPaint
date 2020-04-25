@@ -15,8 +15,6 @@ const int SCREEN_WIDTH=417;
 int main(int argc, char* argv[])
 {
     Window win(SCREEN_HEIGHT, SCREEN_WIDTH);
-    win.set_background("samples\\PetitPaint.bmp");
-    win.refresh();
 
     SDL_Event e;
 

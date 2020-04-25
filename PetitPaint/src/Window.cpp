@@ -50,6 +50,20 @@ Window::Window(const int& SCREEN_HEIGHT, const int& SCREEN_WIDTH): width(SCREEN_
     texture=nullptr;
 
     format = SDL_AllocFormat(SDL_PIXELFORMAT_RGBA32);
+
+    set_background("samples\\PetitPaint.bmp");
+    refresh();
+
+    rect2.w=0;
+    rect2.h=0;
+    rect=rect2;
+    delete_layers();
+    selections.clear();
+    clear();
+    refresh();
+
+    add("samples\\petitpaint.bmp");
+    reload();
 }
 
 Window::~Window()
@@ -88,13 +102,13 @@ void Window::delete_layers()
 
 void Window::delete_composites()
 {
-    std::for_each(composites.begin(), composites.end(), [](CompositeOperation* l){delete l;});
+    std::for_each(composites.rbegin(), composites.rend(), [](CompositeOperation* l){delete l;});
     composites.clear();
 }
 
 void Window::clear()
 {
-    SDL_FillRect(background, nullptr, SDL_MapRGBA(format, 0x0, 0x0, 0x0, 0xFF));
+    SDL_FillRect(background, nullptr, SDL_MapRGBA(format, 0x0, 0x0, 0x0, 0x0));
 }
 
 void Window::swap_background(SDL_Surface* surface)
@@ -104,6 +118,10 @@ void Window::swap_background(SDL_Surface* surface)
         SDL_FreeSurface(background);
     }
     background=surface;
+    for(int i=0; i<background->w*background->h*4; ++i)
+    {
+        ((char*)background->pixels)[i]=0;
+    }
 }
 
 void Window::set_background(std::string path)
@@ -307,6 +325,18 @@ void Window::apply(Operation* operation)
     }
 }
 
+void Window::recursive_add_composite(CompositeOperation* c_operation)
+{
+    for(Operation* o:c_operation->operations)
+    {
+        if(o->get_class()==1)
+        {
+            recursive_add_composite((CompositeOperation*)o);
+            composites.push_back((CompositeOperation*)o);
+        }
+    }
+}
+
 void Window::handle_command(std::string s)
 {
     std::regex togglel("toggle -l ([0-9]+)");
@@ -314,11 +344,14 @@ void Window::handle_command(std::string s)
     std::regex toggless("toggle -s -l ([a-zA-Z0-9]+)");
     std::regex mksel("mksel ([a-zA-Z0-9_]+) -n ([0-9]+)");
     std::regex rm("rm ([0-9]+)");
-    std::regex pwsl("pwsl \\[Y/n\\] ([Y/n])");
+    std::regex pwsl("pwsl");
     std::regex op("op ([a-z]+)");
-    std::regex opp("op ([a-z]+) ([0-9]+)");
-    std::regex opc("op -c ([a-z]+) -n ([0-9]+) (..)");
+    std::regex opp("op ([a-z]+) ([a-zA-Z0-9]+)");
+    std::regex opc("op -c ([a-z]+) -n ([0-9]+)([\u0020-k]*)");
+    std::regex ope("op -e ([a-z]+) -f (.*)");
+    std::regex opi("op -i (.+)");
     std::regex cls("cls");
+    std::regex sw("sw -l ([0-9]+) ([0-9]+)");
 
     std::smatch match;
     if(regex_match(s, match, cls))
@@ -327,10 +360,7 @@ void Window::handle_command(std::string s)
     }
     else if(regex_match(s, match, pwsl))
     {
-        if(match[1].str()=="n")
-            preview_sel=false;
-        else
-            preview_sel=true;
+        preview_sel=!preview_sel;
     }
     else if(regex_match(s, match, togglel))
     {
@@ -512,8 +542,17 @@ void Window::handle_command(std::string s)
                 }
                 else
                 {
-                    std::cout<<"Unrecognized operation\n";
-                    --i;
+                    bool yes=true;
+                    for(CompositeOperation* co1:composites)
+                    {
+                        if(co1->get_label()==s)
+                        {
+                            co->push_back(co1);
+                            yes=false;
+                            break;
+                        }
+                    }
+                    if(yes)std::cout<<"Unrecognized operation\n", --i;
                 }
             }
             else
@@ -523,12 +562,13 @@ void Window::handle_command(std::string s)
             }
         }
         apply(co);
-        if(keep=="-k")composites.push_back(co);
+        if(keep==" -k")composites.push_back(co);
         else delete co;
     }
     else if(regex_match(s, match, opp))
     {
         int par=atoi(match[2].str().c_str());
+        int hx=strtol(match[2].str().c_str(), nullptr, 16);
         s=match[1].str();
         if(s=="add")
         {
@@ -584,6 +624,12 @@ void Window::handle_command(std::string s)
             o(par);
             apply(&o);
         }
+        else if(s=="col")
+        {
+            Operation o("col", &selections, _col);
+            o(hx);
+            apply(&o);
+        }
         else
         {
             std::cout<<"Unrecognized operation\n";
@@ -636,6 +682,44 @@ void Window::handle_command(std::string s)
             }
             if(yes)std::cout<<"Unrecognized operation\n";
         }
+    }
+    else if(regex_match(s, match, ope))
+    {
+        s=match[1].str();
+        bool yes=true;
+        for(CompositeOperation* co:composites)
+        {
+            if(co->get_label()==s)
+            {
+                Formater::export_FUN(co, match[2].str());
+                yes=false;
+                break;
+            }
+        }
+        if(yes)std::cout<<"Unrecognized operation\n";
+    }
+    else if(regex_match(s, match, opi))
+    {
+        CompositeOperation* co=Formater::import_FUN(match[1].str(), &selections);
+        if(co)
+        {
+            recursive_add_composite(co);
+            composites.push_back(co);
+        }
+    }
+    else if(regex_match(s, match, sw))
+    {
+        int first=atoi(match[1].str().c_str());
+        int second=atoi(match[2].str().c_str());
+        first=layers.size()-first;
+        second=layers.size()-second;
+        if(first<0 || first>=layers.size() ||
+           second<0 || second>=layers.size())
+        {
+            std::cout<<"Index out of bounds. Current layer count: "<<layers.size()<<"\n";
+            return;
+        }
+        std::swap(layers[first], layers[second]);
     }
     reload();
 }

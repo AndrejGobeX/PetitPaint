@@ -6,11 +6,14 @@
 #include<string>
 #include"Selection.h"
 #include<cmath>
+#include<algorithm>
 
 typedef void (*Fun)(Pixel& pixel, int p);
 
 class Operation
 {
+    friend class Formater;
+    friend class Window;
     public:
         Operation(std::string _label, std::vector<Selection>* _selections, Fun _f);
         virtual ~Operation();
@@ -19,6 +22,9 @@ class Operation
         virtual void operator()(std::vector<Pixel>& pixels, int w);
 
         virtual std::string get_label(){return label;}
+        virtual std::string get_all_ops(){return label+" "+std::to_string(par);}
+
+        virtual int get_class(){return 0;}
 
     protected:
 
@@ -43,5 +49,6 @@ void _min(Pixel& pixel, int p);
 void _inv(Pixel& pixel, int p);
 void _grs(Pixel& pixel, int p);
 void _baw(Pixel& pixel, int p);
+void _col(Pixel& pixel, int p);
 
 #endif // OPERATION_H

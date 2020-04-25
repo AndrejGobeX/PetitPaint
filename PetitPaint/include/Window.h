@@ -49,6 +49,7 @@ class Window
         void delete_composites();
 
         void apply(Operation* operation);
+        void recursive_add_composite(CompositeOperation* c_operation);
 
     protected:
 
