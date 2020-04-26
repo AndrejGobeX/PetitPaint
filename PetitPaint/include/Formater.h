@@ -5,10 +5,13 @@
 #include"Pixel.h"
 #include<vector>
 #include"Selection.h"
+#include"Layer.h"
+#include<list>
 
 class Image;
 class SDL_Surface;
 class CompositeOperation;
+class Window;
 
 class Formater
 {
@@ -20,6 +23,14 @@ class Formater
         static SDL_Surface* pixels_to_surface(std::vector<Pixel> pixels, int w, int h);
         static void export_FUN(CompositeOperation* co, std::string path);
         static CompositeOperation* import_FUN(std::string path, std::vector<Selection>* selections);
+        static void export_XML(Window* window, std::string path,
+                               std::vector<Layer*>* layers,
+                               std::vector<Selection>* selections,
+                               std::list<CompositeOperation*>* composites);
+        static void import_XML(Window* window, std::string path,
+                               std::vector<Layer*>* layers,
+                               std::vector<Selection>* selections,
+                               std::list<CompositeOperation*>* composites);
 
     protected:
 

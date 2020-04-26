@@ -7,7 +7,6 @@
 #include<windows.h>
 #include<winuser.h>
 #include<vector>
-#include"Formater.h"
 #include<regex>
 #include"Selection.h"
 #include"Operation.h"

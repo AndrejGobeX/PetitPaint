@@ -2,6 +2,7 @@
 #include<iostream>
 #include<fstream>
 #include<string>
+#include"Formater.h"
 
 const int INIT_ERROR=1, WINDOW_ERROR=2, RENDER_ERROR=3;
 
@@ -821,6 +822,30 @@ void Window::handle_event(SDL_Event &e)
                 selections.clear();
                 clear();
                 refresh();
+            }
+            //Open
+            if(y>30 && y<60)
+            {
+                std::string s;
+                std::cout<<"Path to file: ";
+                std::getline(std::cin, s);
+                rect2.w=0;
+                rect2.h=0;
+                rect=rect2;
+                delete_layers();
+                selections.clear();
+                clear();
+                Formater::import_XML(this, s, &layers, &selections, &composites);
+                reload();
+                refresh();
+            }
+            //Save
+            if(y>60 && y<90)
+            {
+                std::string s;
+                std::cout<<"Path to file: ";
+                std::getline(std::cin, s);
+                Formater::export_XML(this, s, &layers, &selections, &composites);
             }
             //Import
             if(y>120 && y<150)

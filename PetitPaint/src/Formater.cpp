@@ -6,6 +6,7 @@
 #include"Image.h"
 #include"CompositeOperation.h"
 #include<string>
+#include"Window.h"
 
 Formater::Formater()
 {
@@ -412,4 +413,244 @@ void Formater::recursive_delete(CompositeOperation* co)
         }
     }
     co->operations.clear();
+}
+
+void Formater::export_XML(Window* window, std::string path, std::vector<Layer*>* layers, std::vector<Selection>* selections, std::list<CompositeOperation*>* composites)
+{
+    if(path.substr(path.size()-4, 4)!=".xml")
+    {
+        std::cout<<"Wrong file format (expected .xml).\n";
+        return;
+    }
+    std::ofstream file(path.c_str());
+    if(!file)
+    {
+        std::cout<<"Could not create .xml file.\n";
+        return;
+    }
+
+    file<<"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    file<<"<layers>\n";
+    int layer_cnt=1;
+    for(Layer* l:(*layers))
+    {
+        file<<"\t<layer>\n\t";
+        file<<(path.substr(0, path.size()-4)+"_layer"+std::to_string(layer_cnt)+".bmp");
+        Formater::export_BMP(l->get_image()->get_surface(), (path.substr(0, path.size()-4)+"_layer"+std::to_string(layer_cnt)+".bmp"));
+        file<<"\n\t</layer>\n";
+        ++layer_cnt;
+    }
+    file<<"</layers>\n";
+
+    file<<"<selections>\n";
+    layer_cnt=1;
+    for(Selection& s:(*selections))
+    {
+        file<<"\t<selection>\n\t";
+        file<<s.label<<" "<<s.rects.size()<<" ";
+        for(SDL_Rect& r:s.rects)
+            file<<r.x<<" "<<r.y<<" "<<r.w<<" "<<r.h<<" ";
+        file<<"\n\t</selection>\n";
+        ++layer_cnt;
+    }
+    file<<"</selections>\n";
+
+    file<<"<composites>\n";
+    layer_cnt=1;
+    for(CompositeOperation* co:(*composites))
+    {
+        file<<"\t<composite>\n\t";
+        file<<(path.substr(0, path.size()-4)+"_composite"+std::to_string(layer_cnt)+".fun");
+        Formater::export_FUN(co, (path.substr(0, path.size()-4)+"_composite"+std::to_string(layer_cnt)+".fun"));
+        file<<"\n\t</composite>\n";
+        ++layer_cnt;
+    }
+    file<<"</composites>\n";
+
+    file.close();
+}
+
+void Formater::import_XML(Window* window, std::string path, std::vector<Layer*>* layers, std::vector<Selection>* selections, std::list<CompositeOperation*>* composites)
+{
+    std::regex file_path("\t(.*)");
+    std::smatch match;
+
+    if(path.substr(path.size()-4, 4)!=".xml")
+    {
+        std::cout<<"Wrong file format (expected .xml).\n";
+        return;
+    }
+    std::ifstream file(path.c_str());
+    if(!file)
+    {
+        std::cout<<"Could not open .xml file\n";
+        return;
+    }
+
+    std::string line;
+    std::getline(file, line);//xml
+    if(line!="<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+    {
+        std::cout<<"File is corrupted.\n";
+        file.close();
+        return;
+    }
+
+    //layers-------------------------------------------------------------
+
+    std::getline(file, line);
+    if(line!="<layers>")
+    {
+        std::cout<<"File is corrupted.\n";
+        file.close();
+        return;
+    }
+
+    while(std::getline(file, line) && line!="</layers>")
+    {
+        if(line!="\t<layer>")
+        {
+            std::cout<<"File is corrupted.\n";
+            file.close();
+            return;
+        }
+
+        std::getline(file, line);
+        if(regex_match(line, match, file_path))
+        {
+            window->add(match[1].str());
+        }
+        else
+        {
+            std::cout<<"File is corrupted.\n";
+            file.close();
+            return;
+        }
+
+        std::getline(file, line);
+        if(line!="\t</layer>")
+        {
+            std::cout<<"File is corrupted.\n";
+            file.close();
+            return;
+        }
+    }
+
+    if(line!="</layers>")
+    {
+        std::cout<<"File is corrupted.\n";
+        file.close();
+        return;
+    }
+
+    //layers-------------------------------------------------------------
+    //selections---------------------------------------------------------
+
+    std::getline(file, line);
+    if(line!="<selections>")
+    {
+        std::cout<<"File is corrupted.\n";
+        file.close();
+        return;
+    }
+
+    int x, y, w, h, c;std::string label;
+
+    while(std::getline(file, line) && line!="</selections>")
+    {
+        if(line!="\t<selection>")
+        {
+            std::cout<<"File is corrupted.\n";
+            file.close();
+            return;
+        }
+
+        file>>label>>c;
+        Selection sel;
+        sel.label=label;
+        for(int i=0; i<c; ++i)
+        {
+            file>>x>>y>>w>>h;
+            SDL_Rect r;
+            r.x=x;
+            r.y=y;
+            r.w=w;
+            r.h=h;
+            sel.rects.push_back(r);
+        }
+        selections->push_back(sel);
+
+        std::getline(file, line);
+        std::getline(file, line);
+        if(line!="\t</selection>")
+        {
+            std::cout<<"File is corrupted.\n";
+            file.close();
+            return;
+        }
+    }
+
+    if(line!="</selections>")
+    {
+        std::cout<<"File is corrupted.\n";
+        file.close();
+        return;
+    }
+
+    //selections---------------------------------------------------------
+    //composites---------------------------------------------------------
+
+    std::getline(file, line);
+    if(line!="<composites>")
+    {
+        std::cout<<"File is corrupted.\n";
+        file.close();
+        return;
+    }
+
+    while(std::getline(file, line) && line!="</composites>")
+    {
+        if(line!="\t<composite>")
+        {
+            std::cout<<"File is corrupted.\n";
+            file.close();
+            return;
+        }
+
+        std::getline(file, line);
+        if(regex_match(line, match, file_path))
+        {
+            CompositeOperation* co=Formater::import_FUN(match[1].str(), selections);
+            if(co)
+            {
+                window->recursive_add_composite(co);
+                composites->push_back(co);
+            }
+        }
+        else
+        {
+            std::cout<<"File is corrupted.\n";
+            file.close();
+            return;
+        }
+
+        std::getline(file, line);
+        if(line!="\t</composite>")
+        {
+            std::cout<<"File is corrupted.\n";
+            file.close();
+            return;
+        }
+    }
+
+    if(line!="</composites>")
+    {
+        std::cout<<"File is corrupted.\n";
+        file.close();
+        return;
+    }
+
+    //composites---------------------------------------------------------
+
+    file.close();
 }
