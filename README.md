@@ -9,7 +9,7 @@ Command list:
     
     toggle -s (x) -> toggles selection (x)
     
-    toggle -s -l -> toggles selection by label
+    toggle -s -l (label) -> toggles selection by label
     
     mksel (name) -n (n) -> creates new selection with label (name) containing (n) rects
     
@@ -19,7 +19,7 @@ Command list:
     
     op (name) (param) -> applies operation with parameter
     
-    op -c (name) -n (n) \[-k\] -> creates and applies new composite operation composed of (n) operations (if -k is used, it is saved for future use and export)
+    op -c (name) -n (n) [-k] -> creates and applies new composite operation composed of (n) operations (if -k is used, it is saved for future use and export)
     
     op -e (name) -f (file_path) -> exports composite operation to a .fun file
     
