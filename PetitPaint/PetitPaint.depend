@@ -47,7 +47,7 @@
 	"Operation.h"
 	<list>
 
-1587911107 d:\etf\petitpaint\petitpaint\include\formater.h
+1587912680 d:\etf\petitpaint\petitpaint\include\formater.h
 	<string>
 	"Pixel.h"
 	<vector>
@@ -55,7 +55,7 @@
 	"Layer.h"
 	<list>
 
-1587811854 source:d:\etf\petitpaint\petitpaint\src\compositeoperation.cpp
+1587912028 source:d:\etf\petitpaint\petitpaint\src\compositeoperation.cpp
 	"CompositeOperation.h"
 	<algorithm>
 
@@ -76,14 +76,14 @@
 1587577072 source:d:\etf\petitpaint\petitpaint\src\selection.cpp
 	"Selection.h"
 
-1587909417 source:d:\etf\petitpaint\petitpaint\src\window.cpp
+1587913597 source:d:\etf\petitpaint\petitpaint\src\window.cpp
 	"Window.h"
 	<iostream>
 	<fstream>
 	<string>
 	"Formater.h"
 
-1587911124 source:d:\etf\petitpaint\petitpaint\src\formater.cpp
+1587913776 source:d:\etf\petitpaint\petitpaint\src\formater.cpp
 	"Formater.h"
 	<SDL.h>
 	<iostream>

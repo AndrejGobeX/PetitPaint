@@ -326,18 +326,6 @@ void Window::apply(Operation* operation)
     }
 }
 
-void Window::recursive_add_composite(CompositeOperation* c_operation)
-{
-    for(Operation* o:c_operation->operations)
-    {
-        if(o->get_class()==1)
-        {
-            recursive_add_composite((CompositeOperation*)o);
-            composites.push_back((CompositeOperation*)o);
-        }
-    }
-}
-
 void Window::handle_command(std::string s)
 {
     std::regex togglel("toggle -l ([0-9]+)");
@@ -701,10 +689,9 @@ void Window::handle_command(std::string s)
     }
     else if(regex_match(s, match, opi))
     {
-        CompositeOperation* co=Formater::import_FUN(match[1].str(), &selections);
+        CompositeOperation* co=Formater::import_FUN(match[1].str(), &selections, &composites);
         if(co)
         {
-            recursive_add_composite(co);
             composites.push_back(co);
         }
     }

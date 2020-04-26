@@ -29,7 +29,8 @@ std::string CompositeOperation::get_all_ops()
 
     for(Operation* o:operations)
     {
-        s+=o->get_all_ops();
+        if(o->get_class()==0)s+=o->get_all_ops();
+        else s+=o->get_label()+" 0";
         s+=" ";
     }
     s+="-e";

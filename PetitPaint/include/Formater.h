@@ -22,7 +22,8 @@ class Formater
         static std::vector<Pixel> surface_to_pixels(SDL_Surface* surface);
         static SDL_Surface* pixels_to_surface(std::vector<Pixel> pixels, int w, int h);
         static void export_FUN(CompositeOperation* co, std::string path);
-        static CompositeOperation* import_FUN(std::string path, std::vector<Selection>* selections);
+        static CompositeOperation* import_FUN(std::string path, std::vector<Selection>* selections,
+                               std::list<CompositeOperation*>* composites);
         static void export_XML(Window* window, std::string path,
                                std::vector<Layer*>* layers,
                                std::vector<Selection>* selections,
@@ -35,7 +36,8 @@ class Formater
     protected:
 
     private:
-        static int process_FUN(CompositeOperation* co, std::ifstream& file);
+        static int process_FUN(CompositeOperation* co, std::ifstream& file,
+                               std::list<CompositeOperation*>* composites);
         static void recursive_delete(CompositeOperation* co);
         Formater();
         virtual ~Formater();

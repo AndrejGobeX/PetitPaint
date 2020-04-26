@@ -229,7 +229,7 @@ void Formater::export_FUN(CompositeOperation* co, std::string path)
     file.close();
 }
 
-CompositeOperation* Formater::import_FUN(std::string path, std::vector<Selection>* selections)
+CompositeOperation* Formater::import_FUN(std::string path, std::vector<Selection>* selections, std::list<CompositeOperation*>* composites)
 {
     if(path.substr(path.size()-4, 4)!=".fun")
     {
@@ -272,9 +272,8 @@ CompositeOperation* Formater::import_FUN(std::string path, std::vector<Selection
         return nullptr;
     }
     CompositeOperation* co=new CompositeOperation(s, selections);
-    if(process_FUN(co, file)==-1)
+    if(process_FUN(co, file, composites)==-1)
     {
-        Formater::recursive_delete(co);
         delete co;
         co=nullptr;
     }
@@ -283,7 +282,7 @@ CompositeOperation* Formater::import_FUN(std::string path, std::vector<Selection
     return co;
 }
 
-int Formater::process_FUN(CompositeOperation* co, std::ifstream& file)
+int Formater::process_FUN(CompositeOperation* co, std::ifstream& file, std::list<CompositeOperation*>* composites)
 {
     std::string s, c;
     file>>s;
@@ -382,37 +381,24 @@ int Formater::process_FUN(CompositeOperation* co, std::ifstream& file)
         }
         else
         {
-            if(c=="-c")
+            bool yes=true;
+            for(CompositeOperation* cop:(*composites))
             {
-                CompositeOperation* coc=new CompositeOperation(s, co->selections);
-                if(process_FUN(coc, file)==-1)
+                if(cop->get_label()==s)
                 {
-                    delete coc;
-                    return -1;
+                    co->push_back(cop);
+                    yes=false;
                 }
-                else
-                {
-                    co->push_back(coc);
-                }
+            }
+            if(yes)
+            {
+                std::cout<<"Unrecognized operation (first import the simplest composite operations).\n";
+                return -1;
             }
         }
         file>>s;
     }
     return 0;
-}
-
-void Formater::recursive_delete(CompositeOperation* co)
-{
-    for(Operation* o:co->operations)
-    {
-        if(o->get_class()==0)delete o;
-        else
-        {
-            recursive_delete((CompositeOperation*)o);
-            delete o;
-        }
-    }
-    co->operations.clear();
 }
 
 void Formater::export_XML(Window* window, std::string path, std::vector<Layer*>* layers, std::vector<Selection>* selections, std::list<CompositeOperation*>* composites)
@@ -620,10 +606,9 @@ void Formater::import_XML(Window* window, std::string path, std::vector<Layer*>*
         std::getline(file, line);
         if(regex_match(line, match, file_path))
         {
-            CompositeOperation* co=Formater::import_FUN(match[1].str(), selections);
+            CompositeOperation* co=Formater::import_FUN(match[1].str(), selections, composites);
             if(co)
             {
-                window->recursive_add_composite(co);
                 composites->push_back(co);
             }
         }
