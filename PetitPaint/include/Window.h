@@ -50,6 +50,8 @@ class Window
         void apply(Operation* operation);
         void recursive_add_composite(CompositeOperation* c_operation);
 
+        std::string get_composite_label(){return (*composites.begin())->get_label();}
+
     protected:
 
     private:

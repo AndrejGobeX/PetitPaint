@@ -1,7 +1,7 @@
 # depslib dependency file v1.0
 1586706269 source:d:\etf\petitpaint\petitpaint\icon.rc
 
-1587805572 source:d:\etf\petitpaint\petitpaint\main.cpp
+1587980095 source:d:\etf\petitpaint\petitpaint\main.cpp
 	<iostream>
 	<SDL.h>
 	"Window.h"
@@ -11,7 +11,7 @@
 	"Formater.h"
 	"Image.h"
 
-1587903867 d:\etf\petitpaint\petitpaint\include\window.h
+1587980058 d:\etf\petitpaint\petitpaint\include\window.h
 	<string>
 	<SDL.h>
 	"Layer.h"
@@ -55,7 +55,7 @@
 	"Layer.h"
 	<list>
 
-1587912028 source:d:\etf\petitpaint\petitpaint\src\compositeoperation.cpp
+1587914126 source:d:\etf\petitpaint\petitpaint\src\compositeoperation.cpp
 	"CompositeOperation.h"
 	<algorithm>
 
