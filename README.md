@@ -27,4 +27,4 @@ Command list:
     
     sw -l (x_first) (x_second) -> swaps positions of two layers
 
-    so -l (x) (percent) -> set opacity of layer (x)
+    so (percent) -l (x)  -> set opacity of layer (x)
