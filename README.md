@@ -26,3 +26,5 @@ Command list:
     op -i (file_path) -> imports composite operation from .fun file
     
     sw -l (x_first) (x_second) -> swaps positions of two layers
+
+    so -l (x) (percent) -> set opacity of layer (x)
