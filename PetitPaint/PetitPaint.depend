@@ -1,7 +1,7 @@
 # depslib dependency file v1.0
-1586706269 source:d:\etf\petitpaint\petitpaint\icon.rc
+1588104125 source:d:\etf\petitpaint\petitpaint\icon.rc
 
-1587980095 source:d:\etf\petitpaint\petitpaint\main.cpp
+1588104125 source:d:\etf\petitpaint\petitpaint\main.cpp
 	<iostream>
 	<SDL.h>
 	"Window.h"
@@ -11,7 +11,7 @@
 	"Formater.h"
 	"Image.h"
 
-1588097782 d:\etf\petitpaint\petitpaint\include\window.h
+1588104125 d:\etf\petitpaint\petitpaint\include\window.h
 	<string>
 	<SDL.h>
 	"Layer.h"
@@ -23,17 +23,17 @@
 	"Operation.h"
 	"CompositeOperation.h"
 
-1588101532 d:\etf\petitpaint\petitpaint\include\layer.h
+1588104125 d:\etf\petitpaint\petitpaint\include\layer.h
 	"Image.h"
 
-1587674483 d:\etf\petitpaint\petitpaint\include\image.h
+1588104125 d:\etf\petitpaint\petitpaint\include\image.h
 
-1587577477 d:\etf\petitpaint\petitpaint\include\selection.h
+1588104125 d:\etf\petitpaint\petitpaint\include\selection.h
 	<SDL.h>
 	<vector>
 	<string>
 
-1587821643 d:\etf\petitpaint\petitpaint\include\operation.h
+1588104125 d:\etf\petitpaint\petitpaint\include\operation.h
 	"Pixel.h"
 	<vector>
 	<string>
@@ -41,13 +41,13 @@
 	<cmath>
 	<algorithm>
 
-1587670140 d:\etf\petitpaint\petitpaint\include\pixel.h
+1588104125 d:\etf\petitpaint\petitpaint\include\pixel.h
 
-1587821651 d:\etf\petitpaint\petitpaint\include\compositeoperation.h
+1588104125 d:\etf\petitpaint\petitpaint\include\compositeoperation.h
 	"Operation.h"
 	<list>
 
-1587912680 d:\etf\petitpaint\petitpaint\include\formater.h
+1588104125 d:\etf\petitpaint\petitpaint\include\formater.h
 	<string>
 	"Pixel.h"
 	<vector>
@@ -55,35 +55,35 @@
 	"Layer.h"
 	<list>
 
-1587914126 source:d:\etf\petitpaint\petitpaint\src\compositeoperation.cpp
+1588104125 source:d:\etf\petitpaint\petitpaint\src\compositeoperation.cpp
 	"CompositeOperation.h"
 	<algorithm>
 
-1587674501 source:d:\etf\petitpaint\petitpaint\src\image.cpp
+1588104125 source:d:\etf\petitpaint\petitpaint\src\image.cpp
 	"Image.h"
 	<SDL.h>
 
-1586941516 source:d:\etf\petitpaint\petitpaint\src\layer.cpp
+1588104125 source:d:\etf\petitpaint\petitpaint\src\layer.cpp
 	"Layer.h"
 
-1587804235 source:d:\etf\petitpaint\petitpaint\src\operation.cpp
+1588104125 source:d:\etf\petitpaint\petitpaint\src\operation.cpp
 	"Operation.h"
 
-1587668135 source:d:\etf\petitpaint\petitpaint\src\pixel.cpp
+1588104125 source:d:\etf\petitpaint\petitpaint\src\pixel.cpp
 	"Pixel.h"
 	<iostream>
 
-1587577072 source:d:\etf\petitpaint\petitpaint\src\selection.cpp
+1588104125 source:d:\etf\petitpaint\petitpaint\src\selection.cpp
 	"Selection.h"
 
-1587982097 source:d:\etf\petitpaint\petitpaint\src\window.cpp
+1588104125 source:d:\etf\petitpaint\petitpaint\src\window.cpp
 	"Window.h"
 	<iostream>
 	<fstream>
 	<string>
 	"Formater.h"
 
-1587913776 source:d:\etf\petitpaint\petitpaint\src\formater.cpp
+1588104125 source:d:\etf\petitpaint\petitpaint\src\formater.cpp
 	"Formater.h"
 	<SDL.h>
 	<iostream>
