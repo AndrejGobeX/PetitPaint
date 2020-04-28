@@ -203,27 +203,7 @@ void Window::reload()
             SDL_FreeSurface(temp);
             l->get_image()->refresh();
         }
-        if(l->isVisible())
-        {
-            if(l->get_opacity()==100)
-                SDL_BlitSurface(l->get_image()->get_surface(), nullptr, background, nullptr);
-            else
-            {
-                SDL_Surface* surface_copy=SDL_CreateRGBSurfaceWithFormat(0, rect.w, rect.h, 32, format->format);
-                SDL_BlitSurface(l->get_image()->get_surface(), nullptr, surface_copy, nullptr);
-                long long temp;
-                //Change A for every pixel
-                for(int i=3; i<rect.w*rect.h*4; i+=4)
-                {
-                    temp=((unsigned char*)(l->get_image()->get_surface()->pixels))[i];
-                    temp*=l->get_opacity();
-                    temp/=100;
-                    ((unsigned char*)(surface_copy->pixels))[i]=(unsigned char)temp;
-                }
-                SDL_BlitSurface(surface_copy, nullptr, background, nullptr);
-                SDL_FreeSurface(surface_copy);
-            }
-        }
+        if(l->isVisible())SDL_BlitSurface(l->get_image()->get_surface(), nullptr, background, nullptr);
     }
     refresh();
 }
@@ -361,29 +341,11 @@ void Window::handle_command(std::string s)
     std::regex opi("op -i (.+)");
     std::regex cls("cls");
     std::regex sw("sw -l ([0-9]+) ([0-9]+)");
-    std::regex setop("setop ([0-9]+) -l ([0-9]+)");
 
     std::smatch match;
     if(regex_match(s, match, cls))
     {
         system("cls");
-    }
-    else if(regex_match(s, match, setop))
-    {
-        int percentage=atoi(match[1].str().c_str());
-        unsigned layer=atoi(match[2].str().c_str());
-        layer=layers.size()-layer;
-        if(layer>=layers.size() || layer<0)
-        {
-            std::cout<<"Index out of bounds. Current layer count: "<<layers.size()<<"\n";
-            return;
-        }
-        if(percentage<0 || percentage>100)
-        {
-            std::cout<<"Opacity out of range (0-100).\n";
-            return;
-        }
-        layers[layer]->set_opacity(percentage);
     }
     else if(regex_match(s, match, pwsl))
     {

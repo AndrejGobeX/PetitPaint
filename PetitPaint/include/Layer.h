@@ -16,9 +16,6 @@ class Layer
         bool isVisible(){return visible;}
         void setVisible(bool _visible){visible=_visible;}
 
-        void set_opacity(int _opacity){opacity=_opacity;}
-        int get_opacity(){return opacity;}
-
     protected:
 
     private:
