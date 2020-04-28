@@ -11,7 +11,7 @@
 	"Formater.h"
 	"Image.h"
 
-1587980951 d:\etf\petitpaint\petitpaint\include\window.h
+1588097782 d:\etf\petitpaint\petitpaint\include\window.h
 	<string>
 	<SDL.h>
 	"Layer.h"
@@ -23,7 +23,7 @@
 	"Operation.h"
 	"CompositeOperation.h"
 
-1587497410 d:\etf\petitpaint\petitpaint\include\layer.h
+1588102736 d:\etf\petitpaint\petitpaint\include\layer.h
 	"Image.h"
 
 1587674483 d:\etf\petitpaint\petitpaint\include\image.h
