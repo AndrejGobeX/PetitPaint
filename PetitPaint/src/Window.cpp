@@ -233,7 +233,7 @@ void Window::out(std::string path)
 void Window::add(std::string path)
 {
     SDL_Surface* surface=nullptr;
-    Image* img;
+    Image* img=nullptr;
 
     std::regex bmp("(.*)\u002Ebmp");
     std::regex pam("(.*)\u002Epam");
@@ -255,7 +255,7 @@ void Window::add(std::string path)
     }
     else if(regex_match(path, match, pam))
     {
-        Image* temp;
+        Image* temp=nullptr;
         temp=Formater::read_PAM(path);
         if(temp!=nullptr){
         img=new Image(SDL_ConvertSurface(temp->get_surface(), format, 0), temp->get_width(), temp->get_height(), 4);
@@ -789,6 +789,7 @@ void Window::handle_event(SDL_Event &e)
             std::cout<<"Selection made.\n";
 
             refresh();
+            saved=false;
         }
         else if(selection)
         {
@@ -802,6 +803,15 @@ void Window::handle_event(SDL_Event &e)
             //New
             if(y>0 && y<30)
             {
+                if(!saved)
+                {
+                    std::cout<<"Are you sure? All unsaved changes will be lost! [Y/n]: ";
+                    char Y;
+                    std::cin>>Y;
+                    if(Y=='n')return;
+                }
+                saved=false;
+
                 rect2.w=0;
                 rect2.h=0;
                 rect=rect2;
@@ -813,6 +823,15 @@ void Window::handle_event(SDL_Event &e)
             //Open
             if(y>30 && y<60)
             {
+                if(!saved)
+                {
+                    std::cout<<"Are you sure? All unsaved changes will be lost! [Y/n]: ";
+                    char Y;
+                    std::cin>>Y;
+                    if(Y=='n')return;
+                }
+                saved=false;
+
                 std::string s;
                 std::cout<<"Path to file: ";
                 std::getline(std::cin, s);
@@ -833,6 +852,7 @@ void Window::handle_event(SDL_Event &e)
                 std::cout<<"Path to file: ";
                 std::getline(std::cin, s);
                 Formater::export_XML(this, s, &layers, &selections, &composites);
+                saved=true;
             }
             //Import
             if(y>120 && y<150)
@@ -842,6 +862,7 @@ void Window::handle_event(SDL_Event &e)
                 std::getline(std::cin, s);
                 add(s);
                 reload();
+                saved=false;
             }
             //Export
             if(y>150 && y<180)
@@ -854,6 +875,15 @@ void Window::handle_event(SDL_Event &e)
             //Quit
             if(y>210 && y<240)
             {
+                if(!saved)
+                {
+                    std::cout<<"Are you sure? All unsaved changes will be lost! [Y/n]: ";
+                    char Y;
+                    std::cin>>Y;
+                    if(Y=='n')return;
+                }
+                saved=false;
+
                 n_quit=false;
             }
             //Command line input
@@ -863,6 +893,7 @@ void Window::handle_event(SDL_Event &e)
                 std::cout<<"Input: ";
                 std::getline(std::cin, s);
                 handle_command(s);
+                saved=false;
             }
         }
 

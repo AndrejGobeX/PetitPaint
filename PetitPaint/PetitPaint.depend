@@ -11,7 +11,7 @@
 	"Formater.h"
 	"Image.h"
 
-1587980058 d:\etf\petitpaint\petitpaint\include\window.h
+1587980951 d:\etf\petitpaint\petitpaint\include\window.h
 	<string>
 	<SDL.h>
 	"Layer.h"
@@ -76,7 +76,7 @@
 1587577072 source:d:\etf\petitpaint\petitpaint\src\selection.cpp
 	"Selection.h"
 
-1587913597 source:d:\etf\petitpaint\petitpaint\src\window.cpp
+1587982097 source:d:\etf\petitpaint\petitpaint\src\window.cpp
 	"Window.h"
 	<iostream>
 	<fstream>

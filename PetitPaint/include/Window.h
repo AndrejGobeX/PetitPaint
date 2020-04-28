@@ -78,6 +78,8 @@ class Window
         bool KeyboardFocus=false;
         bool Minimized=false;
 
+        bool saved=true;
+
         bool selection=false;
         int sx1, sx2;
 };
